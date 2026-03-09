@@ -9,7 +9,7 @@ const navItems = [
 
 export function Navbar() {
 	return (
-		<header className="rounded-2xl border-2 border-[#6b63ff] bg-white px-6 py-5 shadow-sm sm:px-8">
+		<header className="rounded-2xl bg-white px-6 py-5 shadow-sm sm:px-8">
 			<div className="flex items-center justify-between gap-4">
 				<Link href="/" className="flex items-center gap-2.5">
 					<div className="text-lg leading-none font-bold tracking-tight">

@@ -1,3 +1,4 @@
+import { Footer } from "@/components/application/footer";
 import { Navbar } from "@/components/application/navbar";
 
 export default function ApplicationLayout({
@@ -13,6 +14,9 @@ export default function ApplicationLayout({
 			<main className="mx-auto mt-3 w-full max-w-6xl px-4 sm:px-5">
 				{children}
 			</main>
+			<div className="mx-auto mt-3 w-full max-w-6xl px-4 sm:px-5">
+				<Footer />
+			</div>
 		</div>
 	);
 }
