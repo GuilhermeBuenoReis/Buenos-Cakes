@@ -19,8 +19,11 @@ const buttonVariants = cva(
 					"bg-slate-900 text-white hover:bg-slate-800 disabled:bg-slate-200 disabled:text-slate-400",
 				ghost:
 					"bg-transparent text-slate-500 hover:bg-slate-50 hover:text-slate-900 disabled:text-slate-300",
+				toolbarIcon:
+					"bg-transparent text-slate-600 hover:bg-transparent hover:text-[#ff4b61] focus-visible:border-rose-300 focus-visible:ring-rose-100 disabled:text-slate-300",
 				link: "text-primary underline-offset-4 hover:underline",
 			},
+
 			size: {
 				default: "h-10 px-4 py-2.5 has-[>svg]:px-3",
 				xs: "h-6 gap-1 rounded-md px-2 text-xs has-[>svg]:px-1.5 [&_svg:not([class*='size-'])]:size-3",

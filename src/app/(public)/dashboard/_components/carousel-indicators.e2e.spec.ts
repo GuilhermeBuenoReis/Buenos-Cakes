@@ -4,7 +4,7 @@ function getQueryParam(url: string, key: string) {
 	return new URL(url).searchParams.get(key);
 }
 
-test.describe("useUrlState", () => {
+test.describe("nuqs useQueryState", () => {
 	test("reads activeIndex from URL and falls back on invalid value", async ({
 		page,
 	}) => {
@@ -16,6 +16,12 @@ test.describe("useUrlState", () => {
 		).toHaveClass(/w-5/);
 
 		await page.goto("/dashboard?activeIndex=abc");
+
+		await expect(
+			page.getByRole("button", { name: "Ir para imagem 1" }),
+		).toHaveClass(/w-5/);
+
+		await page.goto("/dashboard?activeIndex=");
 
 		await expect(
 			page.getByRole("button", { name: "Ir para imagem 1" }),

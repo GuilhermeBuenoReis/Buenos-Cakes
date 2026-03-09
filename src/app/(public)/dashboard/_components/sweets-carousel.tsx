@@ -2,10 +2,9 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
+import { parseAsInteger, useQueryState } from "nuqs";
 import { useCallback, useEffect } from "react";
-import { z } from "zod";
 import { CarouselIndicators } from "@/app/(public)/dashboard/_components/carousel-indicators";
-import { useUrlState } from "@/hooks/use-url-state";
 
 const SLIDE_INTERVAL_MS = 5000;
 const CAROUSEL_ACTIVE_INDEX_QUERY_PARAM = "activeIndex";
@@ -29,29 +28,27 @@ const carouselImages = [
 	},
 ];
 
-const sweetsCarouselUrlStateSchema = z.object({
-	activeIndex: z.coerce
-		.number()
-		.int()
-		.min(0)
-		.max(carouselImages.length - 1)
-		.catch(0),
-});
-
 const MotionImage = motion.create(Image);
+
+function clampActiveIndex(index: number) {
+	return Math.min(Math.max(index, 0), carouselImages.length - 1);
+}
 
 function getNextSlideIndex(currentIndex: number) {
 	return (currentIndex + 1) % carouselImages.length;
 }
 
 export function SweetsCarousel() {
-	const [activeIndex, setActiveIndex] = useUrlState(
+	const [activeIndex, setActiveIndex] = useQueryState(
 		CAROUSEL_ACTIVE_INDEX_QUERY_PARAM,
-		sweetsCarouselUrlStateSchema.shape.activeIndex,
+		parseAsInteger.withDefault(0),
 	);
+	const safeActiveIndex = clampActiveIndex(activeIndex);
 
 	const handleAdvanceSlide = useCallback(() => {
-		setActiveIndex((currentIndex) => getNextSlideIndex(currentIndex));
+		setActiveIndex((currentIndex) =>
+			getNextSlideIndex(clampActiveIndex(currentIndex)),
+		);
 	}, [setActiveIndex]);
 
 	useEffect(() => {
@@ -70,15 +67,15 @@ export function SweetsCarousel() {
 			<div className="absolute inset-0 rounded-[26px] border border-white/70" />
 			<AnimatePresence mode="wait">
 				<MotionImage
-					alt={carouselImages[activeIndex].alt}
+					alt={carouselImages[safeActiveIndex].alt}
 					animate={{ opacity: 1, scale: 1, x: 0 }}
 					className="relative h-full w-full rounded-[22px] object-cover"
 					exit={{ opacity: 0, scale: 1.04, x: -24 }}
 					fill
 					initial={{ opacity: 0, scale: 0.98, x: 24 }}
-					key={carouselImages[activeIndex].src}
+					key={carouselImages[safeActiveIndex].src}
 					sizes="(max-width: 1024px) 100vw, 560px"
-					src={carouselImages[activeIndex].src}
+					src={carouselImages[safeActiveIndex].src}
 					transition={{ duration: 0.6, ease: "easeInOut" }}
 				/>
 			</AnimatePresence>

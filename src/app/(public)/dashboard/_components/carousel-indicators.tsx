@@ -1,5 +1,4 @@
-import { z } from "zod";
-import { useUrlState } from "@/hooks/use-url-state";
+import { parseAsInteger, useQueryState } from "nuqs";
 
 interface CarouselImage {
 	src: string;
@@ -9,18 +8,21 @@ interface CarouselIndicatorsProps {
 	carouselImages: CarouselImage[];
 }
 
-const CAROUSEL_ACTIVE_INDEX_QUERY_PARAM = "activeIndex";
-
-const carouselIndicatorsUrlStateSchema = z.object({
-	activeIndex: z.coerce.number().int().min(0).catch(0),
-});
+function clampActiveIndex(index: number, maxIndex: number) {
+	return Math.min(Math.max(index, 0), maxIndex);
+}
 
 export function CarouselIndicators({
 	carouselImages,
 }: CarouselIndicatorsProps) {
-	const [activeIndex, setActiveIndex] = useUrlState(
-		CAROUSEL_ACTIVE_INDEX_QUERY_PARAM,
-		carouselIndicatorsUrlStateSchema.shape.activeIndex,
+	const [activeIndex, setActiveIndex] = useQueryState(
+		"activeIndex",
+		parseAsInteger.withDefault(0),
+	);
+
+	const safeActiveIndex = clampActiveIndex(
+		activeIndex,
+		carouselImages.length - 1,
 	);
 
 	function handleSetActiveIndex(index: number) {
@@ -33,7 +35,7 @@ export function CarouselIndicators({
 				<button
 					aria-label={`Ir para imagem ${index + 1}`}
 					className={`pointer-events-auto h-2 rounded-full transition-all ${
-						index === activeIndex ? "w-5 bg-white" : "w-2 bg-white/60"
+						index === safeActiveIndex ? "w-5 bg-white" : "w-2 bg-white/60"
 					}`}
 					key={image.src}
 					onClick={() => handleSetActiveIndex(index)}
