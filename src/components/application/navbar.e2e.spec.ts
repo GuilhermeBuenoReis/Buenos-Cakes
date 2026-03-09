@@ -4,10 +4,11 @@ test.describe("Navbar", () => {
 	test("simulates clicks on navbar links", async ({ page }) => {
 		await page.goto("/dashboard");
 
-		const homeLink = page.getByRole("link", { name: "Início" });
-		const productsLink = page.getByRole("link", { name: "Produtos" });
-		const aboutLink = page.getByRole("link", { name: "Sobre Nós" });
-		const logoLink = page.getByRole("link", { name: "DoceGestão" });
+		const navbar = page.getByRole("banner");
+		const homeLink = navbar.getByRole("link", { name: "Início" });
+		const productsLink = navbar.getByRole("link", { name: "Produtos" });
+		const aboutLink = navbar.getByRole("link", { name: "Sobre Nós" });
+		const logoLink = navbar.getByRole("link", { name: "DoceGestão" });
 
 		await expect(homeLink).toBeVisible();
 		await expect(productsLink).toBeVisible();
