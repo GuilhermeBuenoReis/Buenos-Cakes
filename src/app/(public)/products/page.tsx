@@ -1,39 +1,14 @@
 "use client";
 
-import { formatPrice } from "@/lib/format-price";
-import { parseAsInteger, parseAsStringEnum, useQueryState } from "nuqs";
-import { useMemo } from "react";
 import { CatalogHeader } from "./_components/catalog-header";
 import { ProductCard } from "./_components/product-card";
 import { ProductsPagination } from "./_components/products-pagination";
 import { Sidebar } from "./_components/sidebar";
-
-type SortValue = "popular" | "price-asc" | "price-desc" | "rating";
-interface Product {
-	category: string;
-	image: string;
-	name: string;
-	popularity: number;
-	price: number;
-	rating: number;
-	reviews: number;
-}
-
-interface SidebarCategory {
-	count: number;
-	label: string;
-}
-
-const sortOptions = [
-	{ label: "Mais Populares", value: "popular" },
-	{ label: "Menor Preço", value: "price-asc" },
-	{ label: "Maior Preço", value: "price-desc" },
-	{ label: "Melhor Avaliados", value: "rating" },
-] as const;
-
-const sortValues: SortValue[] = sortOptions.map(
-	(option) => option.value as SortValue,
-);
+import {
+	type Product,
+	ProductsCatalogProvider,
+	useProductsCatalog,
+} from "./_context/products-catalog-context";
 
 const products: Product[] = [
 	{
@@ -158,134 +133,41 @@ const products: Product[] = [
 	},
 ];
 
-const ITEMS_PER_PAGE = 8;
+function ProductsGrid() {
+	const { paginatedProducts } = useProductsCatalog();
 
-function buildPageItems(currentPage: number, totalPages: number) {
-	if (totalPages <= 7) {
-		return Array.from({ length: totalPages }, (_, index) => index + 1);
-	}
-
-	if (currentPage <= 3) {
-		return [1, 2, 3, null, totalPages - 1, totalPages];
-	}
-
-	if (currentPage >= totalPages - 2) {
-		return [1, 2, null, totalPages - 2, totalPages - 1, totalPages];
-	}
-
-	return [
-		1,
-		null,
-		currentPage - 1,
-		currentPage,
-		currentPage + 1,
-		null,
-		totalPages,
-	];
+	return (
+		<div className="grid gap-2.5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+			{paginatedProducts.map((product) => (
+				<ProductCard key={product.name} product={product} />
+			))}
+		</div>
+	);
 }
 
-export default function ProductsPage() {
-	const [sortValue, setSortValue] = useQueryState(
-		"sort",
-		parseAsStringEnum<SortValue>(sortValues).withDefault("popular"),
-	);
-	const [currentPage, setCurrentPage] = useQueryState(
-		"page",
-		parseAsInteger.withDefault(1),
-	);
-	const [selectedCategory] = useQueryState("category", {
-		defaultValue: "Todos",
-		parse: (value) => value ?? "Todos",
-		serialize: (value) => value,
-	});
-
-	const [maxPrice] = useQueryState("maxPrice", parseAsInteger.withDefault(250));
-	const [rating] = useQueryState("rating", parseAsInteger.withDefault(4));
-
-	const sidebarCategories = useMemo<SidebarCategory[]>(() => {
-		const counts = new Map<string, number>();
-
-		for (const product of products) {
-			counts.set(product.category, (counts.get(product.category) ?? 0) + 1);
-		}
-
-		return [
-			{ count: products.length, label: "Todos" },
-			...Array.from(counts, ([label, count]) => ({ count, label })),
-		];
-	}, []);
-
-	const filteredProducts = useMemo(() => {
-		const filtered = products.filter((product) => {
-			const matchesCategory =
-				selectedCategory === "Todos" || product.category === selectedCategory;
-			const matchesPrice = product.price <= maxPrice;
-			const matchesRating = product.rating >= rating;
-
-			return matchesCategory && matchesPrice && matchesRating;
-		});
-
-		return filtered.sort((a, b) => {
-			if (sortValue === "price-asc") return a.price - b.price;
-			if (sortValue === "price-desc") return b.price - a.price;
-			if (sortValue === "rating") return b.rating - a.rating;
-			return b.popularity - a.popularity;
-		});
-	}, [maxPrice, rating, selectedCategory, sortValue]);
-
-	const totalProducts = filteredProducts.length;
-	const totalPages = Math.max(1, Math.ceil(totalProducts / ITEMS_PER_PAGE));
-	const safeCurrentPage = Math.min(Math.max(currentPage, 1), totalPages);
-	const initialIndex = (safeCurrentPage - 1) * ITEMS_PER_PAGE;
-
-	const paginatedProducts = filteredProducts.slice(
-		initialIndex,
-		initialIndex + ITEMS_PER_PAGE,
-	);
-
-	const pageItems = buildPageItems(safeCurrentPage, totalPages);
-
+function ProductsCatalogLayout() {
 	return (
 		<section className="relative min-h-140 overflow-hidden rounded-2xl bg-linear-to-br from-rose-50 via-[#fffaf6] to-amber-50 p-2.5 sm:p-3">
 			<div className="pointer-events-none absolute -top-16 -left-12 h-44 w-44 rounded-full bg-rose-200/30 blur-3xl" />
 			<div className="pointer-events-none absolute right-0 -bottom-20 h-52 w-52 rounded-full bg-amber-200/30 blur-3xl" />
 
 			<div className="relative grid gap-2.5 lg:grid-cols-[220px_minmax(0,1fr)]">
-				<Sidebar categories={sidebarCategories} />
+				<Sidebar />
 
 				<div className="space-y-3 rounded-2xl border border-rose-100/70 bg-white/90 p-3 shadow-[0_14px_36px_-26px_rgba(190,24,93,0.35)] backdrop-blur-sm sm:p-4">
-					<CatalogHeader
-						shownCount={paginatedProducts.length}
-						totalProducts={totalProducts}
-						sortOptions={sortOptions}
-						sortValue={sortValue}
-						onSortChange={(nextValue) => {
-							setSortValue(nextValue as SortValue);
-							setCurrentPage(1);
-						}}
-					/>
-
-					<div className="grid gap-2.5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-						{paginatedProducts.map((product) => (
-							<ProductCard
-								key={product.name}
-								category={product.category}
-								image={product.image}
-								name={product.name}
-								priceLabel={formatPrice(product.price)}
-								reviews={product.reviews}
-							/>
-						))}
-					</div>
-
-					<ProductsPagination
-						currentPage={safeCurrentPage}
-						totalPages={totalPages}
-						pageItems={pageItems}
-						onPageChange={setCurrentPage}
-					/>
+					<CatalogHeader />
+					<ProductsGrid />
+					<ProductsPagination />
 				</div>
 			</div>
 		</section>
+	);
+}
+
+export default function ProductsPage() {
+	return (
+		<ProductsCatalogProvider products={products}>
+			<ProductsCatalogLayout />
+		</ProductsCatalogProvider>
 	);
 }
