@@ -1,8 +1,9 @@
 import { Heart, ShoppingBasket } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
+import type { Product } from "@/api/products/types";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/format-price";
-import type { Product } from "../_context/products-catalog-context";
 
 interface ProductCardProps {
 	product: Product;
@@ -10,7 +11,12 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
 	return (
-		<article className="overflow-hidden rounded-xl border border-rose-100/80 bg-white shadow-[0_14px_28px_-24px_rgba(15,23,42,0.45)] transition hover:-translate-y-0.5 hover:shadow-[0_20px_32px_-24px_rgba(190,24,93,0.32)]">
+		<article className="group relative overflow-hidden rounded-xl border border-rose-100/80 bg-white shadow-[0_14px_28px_-24px_rgba(15,23,42,0.45)] transition hover:-translate-y-0.5 hover:shadow-[0_20px_32px_-24px_rgba(190,24,93,0.32)]">
+			<Link
+				href={`/products/${product.id}`}
+				aria-label={`Ver detalhes de ${product.name}`}
+				className="absolute inset-0 z-10"
+			/>
 			<div className="relative h-34 bg-slate-100 sm:h-36">
 				<Image
 					alt={product.name}
@@ -26,17 +32,17 @@ export function ProductCard({ product }: ProductCardProps) {
 				<button
 					type="button"
 					aria-label={`Favoritar ${product.name}`}
-					className="absolute right-2 top-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-white text-rose-500 shadow-sm"
+					className="absolute top-2 right-2 z-20 inline-flex h-7 w-7 items-center justify-center rounded-full bg-white text-rose-500 shadow-sm"
 				>
 					<Heart className="h-3.5 w-3.5 fill-rose-500" />
 				</button>
 			</div>
 
 			<div className="space-y-1 p-2.5">
-				<h3 className="truncate text-[13px] font-semibold text-slate-900">
+				<h3 className="truncate text-[13px] font-semibold text-slate-900 transition group-hover:text-rose-600">
 					{product.name}
 				</h3>
-				<div className="flex items-center gap-1 text-[11px] text-slate-400">
+				<div className="flex items-center gap-1 text-[12px] text-slate-400">
 					<span className="text-amber-400">★★★★★</span>
 					<span>({product.reviews})</span>
 				</div>
@@ -47,7 +53,8 @@ export function ProductCard({ product }: ProductCardProps) {
 					</strong>
 					<Button
 						size="icon-xs"
-						className="h-7 w-7 rounded-full bg-rose-500 text-white shadow-none hover:bg-rose-600"
+						aria-label={`Adicionar ${product.name} ao carrinho`}
+						className="relative z-20 h-7 w-7 rounded-full bg-rose-500 text-white shadow-none hover:bg-rose-600"
 					>
 						<ShoppingBasket className="h-3.5 w-3.5" />
 					</Button>

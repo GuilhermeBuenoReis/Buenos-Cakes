@@ -7,16 +7,7 @@ import {
 	useContext,
 	useMemo,
 } from "react";
-
-export interface Product {
-	category: string;
-	image: string;
-	name: string;
-	popularity: number;
-	price: number;
-	rating: number;
-	reviews: number;
-}
+import type { Product } from "@/api/products/types";
 
 interface SidebarCategory {
 	count: number;
