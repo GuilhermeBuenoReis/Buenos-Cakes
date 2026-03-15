@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -12,7 +13,9 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en">
-			<body style={{ backgroundColor: "#111", color: "#fff" }}>{children}</body>
+			<body>
+				<NuqsAdapter>{children}</NuqsAdapter>
+			</body>
 		</html>
 	);
 }
