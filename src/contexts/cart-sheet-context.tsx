@@ -7,24 +7,29 @@ import {
 	useState,
 } from "react";
 
-export type CartSheetArtworkVariant = "brigadeiros" | "pote" | "ursinho";
-
 export interface CartSheetItemData {
-	artwork: CartSheetArtworkVariant;
 	highlight: string;
 	id: string;
+	image: string;
 	name: string;
 	quantity: number;
 	unitPrice: number;
 }
 
+interface AddCartSheetItemInput extends Omit<CartSheetItemData, "quantity"> {
+	quantity?: number;
+}
+
 interface CartSheetContextValue {
+	addItem: (item: AddCartSheetItemInput) => void;
 	decreaseQuantity: (itemId: string) => void;
 	hasItems: boolean;
 	increaseQuantity: (itemId: string) => void;
 	itemCount: number;
+	isOpen: boolean;
 	items: CartSheetItemData[];
 	removeItem: (itemId: string) => void;
+	setIsOpen: (nextOpen: boolean) => void;
 	shipping: number;
 	subtotal: number;
 	total: number;
@@ -32,37 +37,39 @@ interface CartSheetContextValue {
 
 const SHIPPING_COST = 0;
 
-const INITIAL_CART_ITEMS: CartSheetItemData[] = [
-	{
-		artwork: "brigadeiros",
-		highlight: "Chocolate Belga & Pistache",
-		id: "brigadeiro-gourmet",
-		name: "Cento de Brigadeiros Gourmet",
-		quantity: 1,
-		unitPrice: 120,
-	},
-	{
-		artwork: "pote",
-		highlight: "Edicao Limitada",
-		id: "bolo-de-pote-ninho",
-		name: "Bolo de Pote Ninho com Nutella",
-		quantity: 2,
-		unitPrice: 15,
-	},
-	{
-		artwork: "ursinho",
-		highlight: "Artesanal",
-		id: "brownie-doce-de-leite",
-		name: "Brownie de Doce de Leite",
-		quantity: 1,
-		unitPrice: 8,
-	},
-];
+function clampQuantity(quantity: number) {
+	return Math.max(1, quantity);
+}
 
 const CartSheetContext = createContext<CartSheetContextValue | null>(null);
 
 export function CartSheetProvider({ children }: PropsWithChildren) {
-	const [items, setItems] = useState(INITIAL_CART_ITEMS);
+	const [isOpen, setIsOpen] = useState(false);
+	const [items, setItems] = useState<CartSheetItemData[]>([]);
+
+	function addItem(item: AddCartSheetItemInput) {
+		const nextQuantity = clampQuantity(item.quantity ?? 1);
+
+		setItems((currentItems) => {
+			const existingItem = currentItems.find(
+				(currentItem) => currentItem.id === item.id,
+			);
+
+			if (!existingItem) {
+				return [{ ...item, quantity: nextQuantity }, ...currentItems];
+			}
+
+			return currentItems.map((currentItem) =>
+				currentItem.id === item.id
+					? {
+							...currentItem,
+							quantity: currentItem.quantity + nextQuantity,
+						}
+					: currentItem,
+			);
+		});
+		setIsOpen(true);
+	}
 
 	function increaseQuantity(itemId: string) {
 		setItems((currentItems) =>
@@ -76,7 +83,7 @@ export function CartSheetProvider({ children }: PropsWithChildren) {
 		setItems((currentItems) =>
 			currentItems.map((item) =>
 				item.id === itemId
-					? { ...item, quantity: Math.max(1, item.quantity - 1) }
+					? { ...item, quantity: clampQuantity(item.quantity - 1) }
 					: item,
 			),
 		);
@@ -98,12 +105,15 @@ export function CartSheetProvider({ children }: PropsWithChildren) {
 	return (
 		<CartSheetContext.Provider
 			value={{
+				addItem,
 				decreaseQuantity,
 				hasItems: items.length > 0,
 				increaseQuantity,
 				itemCount,
+				isOpen,
 				items,
 				removeItem,
+				setIsOpen,
 				shipping: SHIPPING_COST,
 				subtotal,
 				total,

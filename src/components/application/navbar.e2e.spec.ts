@@ -36,7 +36,7 @@ test.describe("Navbar", () => {
 
 		await expect(cartButton).toBeVisible();
 		await expect(profileButton).toBeVisible();
-		await expect(cartButton.getByText("4")).toBeVisible();
+		await expect(cartButton.getByText("0")).toBeVisible();
 
 		const currentUrl = page.url();
 
@@ -44,6 +44,7 @@ test.describe("Navbar", () => {
 		await expect(
 			page.getByRole("heading", { name: "Meu Carrinho" }),
 		).toBeVisible();
+		await expect(page.getByText("Seu carrinho esta vazio")).toBeVisible();
 		await expect.poll(() => page.url()).toBe(currentUrl);
 
 		await page.getByRole("button", { name: "Fechar carrinho" }).click();

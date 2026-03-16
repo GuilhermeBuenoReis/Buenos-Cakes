@@ -1,9 +1,12 @@
 "use client";
 
 import { Minus, Plus, Trash2 } from "lucide-react";
+import {
+	type CartSheetItemData,
+	useCartSheet,
+} from "@/contexts/cart-sheet-context";
 import { formatPrice } from "@/lib/format-price";
 import { CartSheetArtwork } from "./cart-sheet-artwork";
-import { type CartSheetItemData, useCartSheet } from "./cart-sheet-context";
 
 interface CartSheetItemProps {
 	item: CartSheetItemData;
@@ -15,7 +18,10 @@ export function CartSheetItem({ item }: CartSheetItemProps) {
 
 	return (
 		<article className="flex items-start gap-3">
-			<CartSheetArtwork variant={item.artwork} />
+			<CartSheetArtwork
+				alt={`Imagem de ${item.name} no carrinho`}
+				src={item.image}
+			/>
 
 			<div className="min-w-0 flex-1">
 				<div className="flex items-start justify-between gap-2">
@@ -23,7 +29,7 @@ export function CartSheetItem({ item }: CartSheetItemProps) {
 						<h3 className="text-[13px] leading-[1.15rem] font-extrabold text-slate-800">
 							{item.name}
 						</h3>
-						<p className="text-[11px] font-semibold tracking-[0.02em] text-rose-400">
+						<p className="truncate text-[11px] font-semibold tracking-[0.02em] text-rose-400">
 							{item.highlight}
 						</p>
 					</div>

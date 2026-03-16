@@ -18,8 +18,8 @@ import {
 	SheetHeader,
 	SheetTitle,
 } from "@/components/ui/sheet";
+import { useCartSheet } from "@/contexts/cart-sheet-context";
 import { formatPrice } from "@/lib/format-price";
-import { useCartSheet } from "./cart-sheet-context";
 import { CartSheetItem } from "./cart-sheet-item";
 
 const PAYMENT_METHODS = [
@@ -36,7 +36,7 @@ export function CartSheetContent() {
 		<SheetContent
 			side="right"
 			showCloseButton={false}
-			className="w-[88vw] max-w-[360px] gap-0 border-l border-l-[#6f63ff] bg-[#fffefe] p-0 shadow-[-14px_0_34px_rgba(31,41,55,0.12)] sm:w-[372px] sm:max-w-[372px]"
+			className="w-[88vw] max-w-90 gap-0 border-l border-l-[#6f63ff] bg-[#fffefe] p-0 shadow-[-14px_0_34px_rgba(31,41,55,0.12)] sm:w-93 sm:max-w-93"
 		>
 			<div className="flex h-full flex-col">
 				<SheetHeader className="border-b border-slate-100 bg-white px-5 pb-4 pt-5 sm:px-6">
@@ -77,14 +77,14 @@ export function CartSheetContent() {
 							))}
 						</div>
 					) : (
-						<div className="flex h-full min-h-[240px] flex-col items-center justify-center rounded-[24px] border border-dashed border-slate-200 bg-slate-50/70 px-5 text-center">
+						<div className="flex h-full min-h-60 flex-col items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-slate-50/70 px-5 text-center">
 							<div className="mb-3 flex size-12 items-center justify-center rounded-full bg-white text-rose-500 shadow-sm">
 								<ShoppingBag className="size-4" />
 							</div>
 							<h3 className="text-base font-extrabold text-slate-800">
 								Seu carrinho esta vazio
 							</h3>
-							<p className="mt-2 max-w-[16rem] text-[13px] leading-5 text-slate-500">
+							<p className="mt-2 max-w-64 text-[13px] leading-5 text-slate-500">
 								Adicione alguns doces para visualizar o resumo do pedido aqui.
 							</p>
 						</div>

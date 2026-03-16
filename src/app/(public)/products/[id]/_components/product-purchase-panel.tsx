@@ -1,3 +1,4 @@
+import { Minus, Plus, ShoppingBasket, Star, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -7,11 +8,12 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { useCartSheet } from "@/contexts/cart-sheet-context";
 import { formatPrice } from "@/lib/format-price";
-import { Minus, Plus, ShoppingBasket, Star, Truck } from "lucide-react";
 import { useProductDetails } from "../_context/product-details-context";
 
 export function ProductPurchasePanel() {
+	const { addItem } = useCartSheet();
 	const {
 		fillings,
 		fullStars,
@@ -20,12 +22,33 @@ export function ProductPurchasePanel() {
 		quantity,
 		selectedFilling,
 		selectedSize,
+		selectedSizeLabel,
 		setFilling,
 		setMessage,
 		setQuantity,
 		setSize,
 		sizeOptions,
 	} = useProductDetails();
+
+	function handleAddToCart() {
+		const trimmedMessage = message.trim();
+		const highlightParts = [selectedSizeLabel, selectedFilling];
+
+		if (trimmedMessage) {
+			highlightParts.push("Com mensagem");
+		}
+
+		addItem({
+			highlight: highlightParts.join(" • "),
+			id: [product.id, selectedSize, selectedFilling, trimmedMessage]
+				.filter(Boolean)
+				.join("::"),
+			image: product.image,
+			name: product.name,
+			quantity,
+			unitPrice: product.price,
+		});
+	}
 
 	return (
 		<div className="space-y-3.5 rounded-[24px] border border-white/70 bg-white/76 p-3.5 shadow-[0_22px_48px_-34px_rgba(190,24,93,0.28)] backdrop-blur-sm sm:space-y-4 sm:p-4.5">
@@ -158,7 +181,11 @@ export function ProductPurchasePanel() {
 						</Button>
 					</div>
 
-					<Button className="h-11 flex-1 rounded-[18px] text-[13px] shadow-[0_18px_35px_-24px_rgba(244,63,94,0.8)]">
+					<Button
+						type="button"
+						className="h-11 flex-1 rounded-[18px] text-[13px] shadow-[0_18px_35px_-24px_rgba(244,63,94,0.8)]"
+						onClick={handleAddToCart}
+					>
 						<ShoppingBasket className="h-4 w-4" />
 						Adicionar ao Carrinho
 					</Button>

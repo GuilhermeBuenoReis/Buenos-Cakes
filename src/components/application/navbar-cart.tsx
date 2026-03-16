@@ -2,8 +2,8 @@
 
 import { ShoppingCart } from "lucide-react";
 import { Sheet, SheetTrigger } from "@/components/ui/sheet";
+import { useCartSheet } from "@/contexts/cart-sheet-context";
 import { CartSheetContent } from "./cart-sheet-content";
-import { CartSheetProvider, useCartSheet } from "./cart-sheet-context";
 
 function NavbarCartTrigger() {
 	const { itemCount } = useCartSheet();
@@ -25,12 +25,12 @@ function NavbarCartTrigger() {
 }
 
 export function NavbarCart() {
+	const { isOpen, setIsOpen } = useCartSheet();
+
 	return (
-		<CartSheetProvider>
-			<Sheet>
-				<NavbarCartTrigger />
-				<CartSheetContent />
-			</Sheet>
-		</CartSheetProvider>
+		<Sheet open={isOpen} onOpenChange={setIsOpen}>
+			<NavbarCartTrigger />
+			<CartSheetContent />
+		</Sheet>
 	);
 }

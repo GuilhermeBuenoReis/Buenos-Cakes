@@ -1,8 +1,10 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NuqsTestingAdapter, type UrlUpdateEvent } from "nuqs/adapters/testing";
 import { describe, expect, it, vi } from "vitest";
 import type { Product } from "@/api/products/types";
+import { NavbarCart } from "@/components/application/navbar-cart";
+import { CartSheetProvider } from "@/contexts/cart-sheet-context";
 import { formatPrice } from "@/lib/format-price";
 import { ProductDetailsProvider } from "../_context/product-details-context";
 import { ProductDetailsContentClient } from "./product-details-content-client";
@@ -52,15 +54,18 @@ function renderComponent({
 	searchParams?: string;
 } = {}) {
 	return render(
-		<NuqsTestingAdapter
-			hasMemory={Boolean(onUrlUpdate)}
-			onUrlUpdate={onUrlUpdate}
-			searchParams={searchParams}
-		>
-			<ProductDetailsProvider product={product} relatedImages={relatedImages}>
-				<ProductDetailsContentClient />
-			</ProductDetailsProvider>
-		</NuqsTestingAdapter>,
+		<CartSheetProvider>
+			<NavbarCart />
+			<NuqsTestingAdapter
+				hasMemory={Boolean(onUrlUpdate)}
+				onUrlUpdate={onUrlUpdate}
+				searchParams={searchParams}
+			>
+				<ProductDetailsProvider product={product} relatedImages={relatedImages}>
+					<ProductDetailsContentClient />
+				</ProductDetailsProvider>
+			</NuqsTestingAdapter>
+		</CartSheetProvider>,
 	);
 }
 
@@ -161,5 +166,53 @@ describe("ProductDetailsContentClient", () => {
 		expect(screen.getAllByAltText(cookieProduct.name)).toHaveLength(2);
 		expect(fillingTrigger).toHaveTextContent("Doce de Leite");
 		expect(quantityInput).toHaveValue("3");
+	});
+
+	it("adds the configured product to the shared cart and updates the navbar counter", async () => {
+		const user = userEvent.setup();
+		const onUrlUpdate = vi.fn<(event: UrlUpdateEvent) => void>();
+
+		renderComponent({ onUrlUpdate });
+
+		await user.click(
+			screen.getByRole("button", {
+				name: /Grande/i,
+			}),
+		);
+		await waitFor(() =>
+			expect(screen.getByText(`${baseProduct.name} - Grande`)).toBeVisible(),
+		);
+		await user.click(
+			screen.getByRole("button", {
+				name: "Aumentar quantidade",
+			}),
+		);
+		await user.click(
+			screen.getByRole("button", {
+				name: "Aumentar quantidade",
+			}),
+		);
+		await user.click(
+			screen.getByRole("button", {
+				name: "Adicionar ao Carrinho",
+			}),
+		);
+
+		const cartButton = document.body.querySelector(
+			'button[aria-label="Carrinho"]',
+		);
+		const cartDialog = screen.getByRole("dialog");
+
+		expect(cartButton).toHaveTextContent("3");
+		expect(within(cartDialog).getByText(baseProduct.name)).toBeVisible();
+		expect(
+			within(cartDialog).getByAltText(
+				`Imagem de ${baseProduct.name} no carrinho`,
+			),
+		).toBeVisible();
+		expect(
+			within(cartDialog).getByText("Grande • Creme de Baunilha (Padrao)"),
+		).toBeVisible();
+		expect(within(cartDialog).getAllByText(/437,70/)).toHaveLength(3);
 	});
 });
