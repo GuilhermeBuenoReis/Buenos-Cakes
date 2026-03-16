@@ -1,5 +1,9 @@
-import { ShoppingCart, User } from "lucide-react";
+"use client";
+
+import { User } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { NavbarCart } from "./navbar-cart";
 
 const navItems = [
 	{ label: "Início", href: "/dashboard" },
@@ -7,11 +11,25 @@ const navItems = [
 	{ label: "Sobre Nós", href: "#" },
 ];
 
+function isNavItemActive(pathname: string, href: string) {
+	if (href === "#") {
+		return false;
+	}
+
+	if (href === "/dashboard") {
+		return pathname === "/" || pathname === href;
+	}
+
+	return pathname === href || pathname.startsWith(`${href}/`);
+}
+
 export function Navbar() {
+	const pathname = usePathname();
+
 	return (
 		<header className="rounded-2xl bg-white px-6 py-5 shadow-sm sm:px-8">
 			<div className="flex items-center justify-between gap-4">
-				<Link href="/" className="flex items-center gap-2.5">
+				<Link href="/dashboard" className="flex items-center gap-2.5">
 					<div className="text-lg leading-none font-bold tracking-tight">
 						<span className="text-[#1f2937]">Doce</span>
 						<span className="text-[#ff4b61]">Gestão</span>
@@ -19,32 +37,28 @@ export function Navbar() {
 				</Link>
 
 				<nav className="hidden items-center gap-11 md:flex">
-					{navItems.map((item, index) => (
-						<Link
-							key={item.label}
-							href={item.href}
-							className={
-								index === 0
-									? "text-base font-semibold text-[#ff4b61]"
-									: "text-base font-semibold text-[#586274] transition hover:text-[#ff4b61]"
-							}
-						>
-							{item.label}
-						</Link>
-					))}
+					{navItems.map((item) => {
+						const isActive = isNavItemActive(pathname, item.href);
+
+						return (
+							<Link
+								key={item.label}
+								href={item.href}
+								aria-current={isActive ? "page" : undefined}
+								className={
+									isActive
+										? "text-base font-semibold text-[#ff4b61]"
+										: "text-base font-semibold text-[#586274] transition hover:text-[#ff4b61]"
+								}
+							>
+								{item.label}
+							</Link>
+						);
+					})}
 				</nav>
 
 				<div className="flex items-center gap-5 text-[#4b5563]">
-					<button
-						type="button"
-						aria-label="Carrinho"
-						className="relative transition hover:text-[#ff4b61] cursor-pointer"
-					>
-						<ShoppingCart className="h-5 w-5" />
-						<span className="absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#ff4b61] px-1 text-[10px] font-semibold leading-none text-white">
-							3
-						</span>
-					</button>
+					<NavbarCart />
 
 					<button
 						type="button"
