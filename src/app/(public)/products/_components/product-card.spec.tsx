@@ -1,6 +1,10 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { NuqsTestingAdapter } from "nuqs/adapters/testing";
 import { describe, expect, it } from "vitest";
 import type { Product } from "@/api/products/types";
+import { NavbarCart } from "@/components/application/navbar-cart";
+import { CartSheetProvider } from "@/contexts/cart-sheet-context";
 import { ProductCard } from "./product-card";
 
 const product: Product = {
@@ -19,7 +23,13 @@ const product: Product = {
 
 describe("ProductCard", () => {
 	it("renders the product data, details link and action buttons", () => {
-		render(<ProductCard product={product} />);
+		render(
+			<NuqsTestingAdapter hasMemory>
+				<CartSheetProvider>
+					<ProductCard product={product} />
+				</CartSheetProvider>
+			</NuqsTestingAdapter>,
+		);
 
 		expect(
 			screen.getByRole("link", {
@@ -43,5 +53,37 @@ describe("ProductCard", () => {
 				name: `Adicionar ${product.name} ao carrinho`,
 			}),
 		).toBeVisible();
+	});
+
+	it("adds the clicked product to the shared cart and updates the navbar counter", async () => {
+		const user = userEvent.setup();
+
+		render(
+			<NuqsTestingAdapter hasMemory>
+				<CartSheetProvider>
+					<NavbarCart />
+					<ProductCard product={product} />
+				</CartSheetProvider>
+			</NuqsTestingAdapter>,
+		);
+
+		await user.click(
+			screen.getByRole("button", {
+				name: `Adicionar ${product.name} ao carrinho`,
+			}),
+		);
+
+		const cartButton = document.body.querySelector(
+			'button[aria-label="Carrinho"]',
+		);
+		const cartDialog = screen.getByRole("dialog");
+
+		expect(cartButton).toHaveTextContent("1");
+		expect(within(cartDialog).getByText(product.name)).toBeVisible();
+		expect(
+			within(cartDialog).getByAltText(`Imagem de ${product.name} no carrinho`),
+		).toBeVisible();
+		expect(within(cartDialog).getByText(product.category)).toBeVisible();
+		expect(within(cartDialog).getAllByText(/145,90/)).toHaveLength(3);
 	});
 });

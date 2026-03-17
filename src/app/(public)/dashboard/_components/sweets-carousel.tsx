@@ -7,7 +7,6 @@ import { useCallback, useEffect } from "react";
 import { CarouselIndicators } from "@/app/(public)/dashboard/_components/carousel-indicators";
 
 const SLIDE_INTERVAL_MS = 5000;
-const CAROUSEL_ACTIVE_INDEX_QUERY_PARAM = "activeIndex";
 
 const carouselImages = [
 	{
@@ -40,7 +39,7 @@ function getNextSlideIndex(currentIndex: number) {
 
 export function SweetsCarousel() {
 	const [activeIndex, setActiveIndex] = useQueryState(
-		CAROUSEL_ACTIVE_INDEX_QUERY_PARAM,
+		"activeIndex",
 		parseAsInteger.withDefault(0),
 	);
 	const safeActiveIndex = clampActiveIndex(activeIndex);
