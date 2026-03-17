@@ -1,5 +1,6 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { NuqsTestingAdapter } from "nuqs/adapters/testing";
 import { describe, expect, it } from "vitest";
 import type { Product } from "@/api/products/types";
 import { NavbarCart } from "@/components/application/navbar-cart";
@@ -23,9 +24,11 @@ const product: Product = {
 describe("ProductCard", () => {
 	it("renders the product data, details link and action buttons", () => {
 		render(
-			<CartSheetProvider>
-				<ProductCard product={product} />
-			</CartSheetProvider>,
+			<NuqsTestingAdapter hasMemory>
+				<CartSheetProvider>
+					<ProductCard product={product} />
+				</CartSheetProvider>
+			</NuqsTestingAdapter>,
 		);
 
 		expect(
@@ -56,10 +59,12 @@ describe("ProductCard", () => {
 		const user = userEvent.setup();
 
 		render(
-			<CartSheetProvider>
-				<NavbarCart />
-				<ProductCard product={product} />
-			</CartSheetProvider>,
+			<NuqsTestingAdapter hasMemory>
+				<CartSheetProvider>
+					<NavbarCart />
+					<ProductCard product={product} />
+				</CartSheetProvider>
+			</NuqsTestingAdapter>,
 		);
 
 		await user.click(

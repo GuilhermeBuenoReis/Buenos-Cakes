@@ -1,5 +1,6 @@
 "use client";
 
+import { parseAsBoolean, useQueryState } from "nuqs";
 import {
 	createContext,
 	type PropsWithChildren,
@@ -44,8 +45,15 @@ function clampQuantity(quantity: number) {
 const CartSheetContext = createContext<CartSheetContextValue | null>(null);
 
 export function CartSheetProvider({ children }: PropsWithChildren) {
-	const [isOpen, setIsOpen] = useState(false);
+	const [isOpen, setCartOpen] = useQueryState(
+		"cart",
+		parseAsBoolean.withDefault(false),
+	);
 	const [items, setItems] = useState<CartSheetItemData[]>([]);
+
+	function setIsOpen(nextOpen: boolean) {
+		void setCartOpen(nextOpen);
+	}
 
 	function addItem(item: AddCartSheetItemInput) {
 		const nextQuantity = clampQuantity(item.quantity ?? 1);

@@ -54,18 +54,18 @@ function renderComponent({
 	searchParams?: string;
 } = {}) {
 	return render(
-		<CartSheetProvider>
-			<NavbarCart />
-			<NuqsTestingAdapter
-				hasMemory={Boolean(onUrlUpdate)}
-				onUrlUpdate={onUrlUpdate}
-				searchParams={searchParams}
-			>
+		<NuqsTestingAdapter
+			hasMemory={Boolean(onUrlUpdate)}
+			onUrlUpdate={onUrlUpdate}
+			searchParams={searchParams}
+		>
+			<CartSheetProvider>
+				<NavbarCart />
 				<ProductDetailsProvider product={product} relatedImages={relatedImages}>
 					<ProductDetailsContentClient />
 				</ProductDetailsProvider>
-			</NuqsTestingAdapter>
-		</CartSheetProvider>,
+			</CartSheetProvider>
+		</NuqsTestingAdapter>,
 	);
 }
 
