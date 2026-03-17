@@ -38,22 +38,47 @@ test.describe("Navbar", () => {
 		await expect(profileButton).toBeVisible();
 		await expect(cartButton.getByText("0")).toBeVisible();
 
-		const currentUrl = page.url();
+		const currentPathname = new URL(page.url()).pathname;
 
 		await cartButton.click();
 		await expect(
 			page.getByRole("heading", { name: "Meu Carrinho" }),
 		).toBeVisible();
 		await expect(page.getByText("Seu carrinho esta vazio")).toBeVisible();
-		await expect.poll(() => page.url()).toBe(currentUrl);
+		await expect
+			.poll(() => {
+				const url = new URL(page.url());
+
+				return {
+					cart: url.searchParams.get("cart"),
+					pathname: url.pathname,
+				};
+			})
+			.toEqual({
+				cart: "true",
+				pathname: currentPathname,
+			});
 
 		await page.getByRole("button", { name: "Fechar carrinho" }).click();
 		await expect(
 			page.getByRole("heading", { name: "Meu Carrinho" }),
 		).not.toBeVisible();
+		await expect
+			.poll(() => {
+				const url = new URL(page.url());
+
+				return {
+					cart: url.searchParams.get("cart"),
+					pathname: url.pathname,
+				};
+			})
+			.toEqual({
+				cart: null,
+				pathname: currentPathname,
+			});
 
 		await profileButton.click();
 		await expect(profileButton).toBeFocused();
-		await expect.poll(() => page.url()).toBe(currentUrl);
+		await expect.poll(() => new URL(page.url()).pathname).toBe(currentPathname);
 	});
 });
