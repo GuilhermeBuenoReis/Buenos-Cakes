@@ -1,11 +1,17 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NuqsTestingAdapter } from "nuqs/adapters/testing";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { Product } from "@/api/products/types";
 import { NavbarCart } from "@/components/application/navbar-cart";
 import { CartSheetProvider } from "@/contexts/cart-sheet-context";
 import { ProductCard } from "./product-card";
+
+vi.mock("next/navigation", () => ({
+	useRouter: () => ({
+		push: vi.fn(),
+	}),
+}));
 
 const product: Product = {
 	category: "Bolos",

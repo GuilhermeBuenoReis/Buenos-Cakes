@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useCallback, useEffect } from "react";
-import { CarouselIndicators } from "@/app/(public)/dashboard/_components/carousel-indicators";
+import { CarouselIndicators } from "@/app/(private)/(application)/dashboard/_components/carousel-indicators";
 
 const SLIDE_INTERVAL_MS = 5000;
 

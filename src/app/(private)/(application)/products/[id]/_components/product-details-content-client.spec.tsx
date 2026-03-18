@@ -9,6 +9,12 @@ import { formatPrice } from "@/lib/format-price";
 import { ProductDetailsProvider } from "../_context/product-details-context";
 import { ProductDetailsContentClient } from "./product-details-content-client";
 
+vi.mock("next/navigation", () => ({
+	useRouter: () => ({
+		push: vi.fn(),
+	}),
+}));
+
 const baseProduct: Product = {
 	category: "Bolos",
 	description:

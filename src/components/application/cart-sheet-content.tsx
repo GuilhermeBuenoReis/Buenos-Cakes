@@ -9,6 +9,7 @@ import {
 	X,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
 	SheetClose,
@@ -29,6 +30,7 @@ const PAYMENT_METHODS = [
 ] as const;
 
 export function CartSheetContent() {
+	const router = useRouter();
 	const { hasItems, itemCount, items, shipping, subtotal, total } =
 		useCartSheet();
 
@@ -111,13 +113,26 @@ export function CartSheetContent() {
 						<span className="text-rose-500">{formatPrice(total)}</span>
 					</div>
 
-					<Button
-						className="h-11 rounded-full text-sm font-extrabold shadow-[0_14px_24px_rgba(244,63,94,0.18)]"
-						disabled={!hasItems}
-					>
-						Finalizar Pedido
-						<ArrowRight className="size-3.5" />
-					</Button>
+					{hasItems ? (
+						<Button
+							className="h-11 rounded-full text-sm font-extrabold shadow-[0_14px_24px_rgba(244,63,94,0.18)]"
+							onClick={() => {
+								router.push("/checkout");
+							}}
+							type="button"
+						>
+							Finalizar Pedido
+							<ArrowRight className="size-3.5" />
+						</Button>
+					) : (
+						<Button
+							className="h-11 rounded-full text-sm font-extrabold shadow-[0_14px_24px_rgba(244,63,94,0.18)]"
+							disabled
+						>
+							Finalizar Pedido
+							<ArrowRight className="size-3.5" />
+						</Button>
+					)}
 
 					<Link
 						className="text-[13px] font-medium text-slate-400 transition hover:text-slate-700"
