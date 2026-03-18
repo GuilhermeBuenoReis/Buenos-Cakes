@@ -22,18 +22,18 @@ interface AddCartSheetItemInput extends Omit<CartSheetItemData, "quantity"> {
 }
 
 interface CartSheetContextValue {
-	addItem: (item: AddCartSheetItemInput) => void;
-	decreaseQuantity: (itemId: string) => void;
+	items: CartSheetItemData[];
 	hasItems: boolean;
-	increaseQuantity: (itemId: string) => void;
 	itemCount: number;
 	isOpen: boolean;
-	items: CartSheetItemData[];
-	removeItem: (itemId: string) => void;
-	setIsOpen: (nextOpen: boolean) => void;
 	shipping: number;
 	subtotal: number;
 	total: number;
+	addItem: (item: AddCartSheetItemInput) => void;
+	decreaseQuantity: (itemId: string) => void;
+	increaseQuantity: (itemId: string) => void;
+	removeItem: (itemId: string) => void;
+	setIsOpen: (nextOpen: boolean) => void;
 }
 
 const SHIPPING_COST = 0;

@@ -31,21 +31,21 @@ const ITEMS_PER_PAGE = 8;
 
 interface ProductsCatalogContextValue {
 	categories: SidebarCategory[];
+	paginatedProducts: Product[];
+	sortOptions: readonly (typeof SORT_OPTIONS)[number][];
 	currentPage: number;
 	maxPrice: number;
-	paginatedProducts: Product[];
 	rating: number;
 	selectedCategory: string;
+	shownCount: number;
+	sortValue: SortValue;
+	totalPages: number;
+	totalProducts: number;
 	setCurrentPage: (nextPage: number) => void;
 	setMaxPrice: (nextValue: number) => void;
 	setRating: (nextValue: number) => void;
 	setSelectedCategory: (nextCategory: string) => void;
 	setSortValue: (nextSort: SortValue) => void;
-	shownCount: number;
-	sortOptions: readonly (typeof SORT_OPTIONS)[number][];
-	sortValue: SortValue;
-	totalPages: number;
-	totalProducts: number;
 }
 
 const ProductsCatalogContext =

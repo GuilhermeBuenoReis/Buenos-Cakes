@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { addDays } from "date-fns";
 import { describe, expect, it } from "vitest";
+import { dayjs, getCalendarDayKey } from "@/lib/dayjs";
 import { CheckoutPickupProvider } from "../_context/checkout-pickup-context";
 import {
 	CheckoutPickupScheduler,
@@ -38,7 +38,7 @@ describe("CheckoutPickupScheduler", () => {
 
 	it("opens the calendar and allows selecting a date from the next week", async () => {
 		const user = userEvent.setup();
-		const nextWeekDate = addDays(getInitialPickupDate(), 9);
+		const nextWeekDate = dayjs(getInitialPickupDate()).add(9, "day").toDate();
 
 		renderCheckoutPickupScheduler();
 
@@ -48,7 +48,7 @@ describe("CheckoutPickupScheduler", () => {
 
 		const calendarPanel = screen.getByTestId("pickup-calendar-panel");
 		const nextWeekButton = calendarPanel.querySelector<HTMLButtonElement>(
-			`button[data-day="${nextWeekDate.toLocaleDateString()}"]`,
+			`button[data-day="${getCalendarDayKey(nextWeekDate)}"]`,
 		);
 
 		expect(nextWeekButton).not.toBeNull();

@@ -23,21 +23,22 @@ export function CheckoutPageContent() {
 
 	return (
 		<CheckoutPickupProvider>
-			<div className="space-y-6 pb-4">
+			<div className="relative space-y-7 pb-6">
+				<div className="pointer-events-none absolute inset-x-0 top-4 -z-10 h-56 rounded-[2.5rem] bg-[radial-gradient(circle_at_top_right,rgba(225,105,135,0.1),transparent_36%),radial-gradient(circle_at_left,rgba(148,163,184,0.08),transparent_26%)]" />
 				<CheckoutHero />
 
-				<div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
-					<div className="space-y-5">
-						<CheckoutCard className="bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(255,250,250,0.92)_100%)]">
-							<div className="flex items-center gap-3">
-								<div className="flex size-11 items-center justify-center rounded-2xl bg-rose-50 text-rose-500">
+				<div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_23rem] xl:items-start">
+					<div className="space-y-6">
+						<CheckoutCard className="bg-[#fffdfa]">
+							<div className="flex items-start gap-4">
+								<div className="flex size-11 items-center justify-center rounded-[1.1rem] border border-[#f0e1e3] bg-[#fff4f5] text-rose-500">
 									<UserRound className="size-4" />
 								</div>
-								<div>
-									<h2 className="text-lg font-extrabold text-slate-900">
+								<div className="space-y-1.5">
+									<h2 className="text-lg font-extrabold tracking-tight text-slate-900">
 										Seus Dados Pessoais
 									</h2>
-									<p className="text-sm text-slate-500">
+									<p className="max-w-lg text-sm leading-6 text-slate-600">
 										Preencha os campos para identificação da retirada.
 									</p>
 								</div>
@@ -46,14 +47,14 @@ export function CheckoutPageContent() {
 							<CheckoutPersonalInfoForm />
 						</CheckoutCard>
 
-						<CheckoutCard className="bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(255,248,249,0.94)_100%)]">
+						<CheckoutCard className="bg-[#fffdfa]">
 							<CheckoutPickupLocationCard location={pickupLocation} />
 							<CheckoutPickupScheduler />
 						</CheckoutCard>
 
-						<div className="flex flex-col gap-3 rounded-[1.8rem] border border-white/80 bg-white/78 p-3 shadow-[0_28px_54px_-42px_rgba(15,23,42,0.35)] sm:flex-row sm:items-center sm:justify-between sm:p-4">
+						<div className="flex flex-col gap-4 rounded-[1.75rem] border border-[#ebe3e3] bg-[#fffdfa] p-4 shadow-[0_20px_48px_-38px_rgba(15,23,42,0.16)] sm:flex-row sm:items-center sm:justify-between sm:px-5">
 							<Link
-								className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition hover:text-rose-500"
+								className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 transition hover:text-rose-500"
 								href="/products?cart=true"
 							>
 								<ArrowLeft className="size-4" />
@@ -61,7 +62,7 @@ export function CheckoutPageContent() {
 							</Link>
 
 							<Button
-								className="h-11 rounded-full bg-[linear-gradient(135deg,#ff4b61_0%,#ff7e6d_100%)] px-6 text-white shadow-[0_22px_34px_-20px_rgba(244,63,94,0.65)] hover:brightness-[0.98]"
+								className="h-11 rounded-full bg-[#d45470] px-6 text-white shadow-[0_18px_36px_-24px_rgba(212,84,112,0.45)] hover:bg-[#c74a65]"
 								disabled={!hasItems}
 								type="button"
 							>

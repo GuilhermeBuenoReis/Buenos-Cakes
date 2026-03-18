@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { addDays } from "date-fns";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { dayjs, getCalendarDayKey } from "@/lib/dayjs";
 
 const useCartSheetMock = vi.fn();
 
@@ -80,7 +80,7 @@ describe("CheckoutPageContent", () => {
 
 	it("updates the pickup summary when selecting another date in the calendar and a time", async () => {
 		const user = userEvent.setup();
-		const nextWeekDate = addDays(getInitialPickupDate(), 9);
+		const nextWeekDate = dayjs(getInitialPickupDate()).add(9, "day").toDate();
 
 		render(<CheckoutPageContent />);
 
@@ -93,12 +93,15 @@ describe("CheckoutPageContent", () => {
 
 		const calendarPanel = screen.getByTestId("pickup-calendar-panel");
 		const nextWeekButton = calendarPanel.querySelector<HTMLButtonElement>(
-			`button[data-day="${nextWeekDate.toLocaleDateString()}"]`,
+			`button[data-day="${getCalendarDayKey(nextWeekDate)}"]`,
 		);
 
 		expect(nextWeekButton).not.toBeNull();
+		if (!nextWeekButton) {
+			throw new Error("Expected a calendar button for the next week date.");
+		}
 
-		await user.click(nextWeekButton!);
+		await user.click(nextWeekButton);
 
 		expect(screen.getByTestId("pickup-date-summary")).toHaveTextContent(
 			formatPickupSummaryDate(nextWeekDate),

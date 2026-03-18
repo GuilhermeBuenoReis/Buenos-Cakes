@@ -1,5 +1,4 @@
-import { format, startOfDay } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { dayjs } from "@/lib/dayjs";
 
 export const defaultPickupTime = "14:00";
 
@@ -8,13 +7,9 @@ function capitalize(value: string) {
 }
 
 export function getInitialPickupDate() {
-	return startOfDay(new Date());
+	return dayjs().startOf("day").toDate();
 }
 
 export function formatPickupSummaryDate(date: Date) {
-	return capitalize(
-		format(date, "EEEE, dd 'de' MMMM", {
-			locale: ptBR,
-		}),
-	);
+	return capitalize(dayjs(date).format("dddd, DD [de] MMMM"));
 }
