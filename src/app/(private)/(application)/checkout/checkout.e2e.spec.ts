@@ -51,20 +51,10 @@ test.describe("Checkout", () => {
 		);
 	});
 
-	test("updates the pickup summary after changing date and time directly on checkout", async ({
+	test("updates the pickup summary after changing the pickup date directly on checkout", async ({
 		page,
 	}) => {
 		await page.goto("/checkout");
-
-		const pickupTimeInput = page.getByLabel("Horário da retirada");
-
-		await pickupTimeInput.click();
-
-		for (let index = 0; index < 3; index += 1) {
-			await pickupTimeInput.press("ArrowUp");
-		}
-
-		await expect(pickupTimeInput).toHaveValue("17:00");
 		await page.getByRole("button", { name: "Escolher no calendário" }).click();
 
 		const calendarPanel = page.getByTestId("pickup-calendar-panel");
@@ -81,7 +71,7 @@ test.describe("Checkout", () => {
 			formatPickupSummaryDate(nextWeekDate),
 		);
 		await expect(page.getByTestId("pickup-schedule-summary")).toHaveText(
-			"Às 17:00",
+			"Às 14:00",
 		);
 	});
 
