@@ -26,9 +26,12 @@ function Input({
 	variant,
 	...props
 }: React.ComponentProps<"input"> & VariantProps<typeof inputVariants>) {
+	const isTimeInput = type === "time";
+
 	return (
 		<input
 			type={type}
+			data-input-type={isTimeInput ? "time" : undefined}
 			data-slot="input"
 			className={cn(inputVariants({ variant }), className)}
 			{...props}

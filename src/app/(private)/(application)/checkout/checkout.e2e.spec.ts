@@ -28,8 +28,8 @@ test.describe("Checkout", () => {
 		await expect(page.getByText("Qtd. 1")).toBeVisible();
 		await expect(page.getByText("1 item")).toBeVisible();
 		await expect(
-			page.getByRole("button", { name: "Finalizar Pedido" }),
-		).toBeEnabled();
+			page.getByRole("link", { name: "Ir para Pagamento" }),
+		).toHaveAttribute("href", "/checkout/payment");
 	});
 
 	test("shows the empty state and disabled actions when opening checkout without cart items", async ({
@@ -44,7 +44,7 @@ test.describe("Checkout", () => {
 			page.getByRole("button", { name: "Próximo Passo" }),
 		).toBeDisabled();
 		await expect(
-			page.getByRole("button", { name: "Finalizar Pedido" }),
+			page.getByRole("button", { name: "Ir para Pagamento" }),
 		).toBeDisabled();
 		await expect(page.getByTestId("pickup-schedule-summary")).toHaveText(
 			"Às 14:00",
@@ -93,5 +93,26 @@ test.describe("Checkout", () => {
 		await page.getByRole("link", { name: "Voltar ao Carrinho" }).click();
 
 		await expect(page).toHaveURL(/\/products\?cart=true$/);
+	});
+
+	test("moves to the payment step when clicking next step", async ({
+		page,
+	}) => {
+		await page.goto("/products");
+
+		await page
+			.getByRole("button", {
+				name: "Adicionar Bolo Red Velvet Premium ao carrinho",
+			})
+			.click();
+
+		await page.getByRole("button", { name: "Finalizar Pedido" }).click();
+		await page.getByRole("link", { name: "Próximo Passo" }).click();
+
+		await expect(page).toHaveURL(/\/checkout\/payment$/);
+		await expect(
+			page.getByRole("heading", { name: "Pagamento do Pedido" }),
+		).toBeVisible();
+		await expect(page.getByText("Escolha como deseja pagar")).toBeVisible();
 	});
 });

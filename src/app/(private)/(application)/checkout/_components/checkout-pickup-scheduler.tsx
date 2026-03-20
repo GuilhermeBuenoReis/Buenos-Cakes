@@ -69,7 +69,9 @@ export function CheckoutPickupScheduler() {
 	}, []);
 
 	const baseDate = useMemo(() => getInitialPickupDate(), []);
+
 	const quickPickDates = useMemo(() => getQuickPickDates(baseDate), [baseDate]);
+
 	const pickupRange = useMemo(
 		() => getPickupCalendarRange(baseDate),
 		[baseDate],
@@ -97,7 +99,7 @@ export function CheckoutPickupScheduler() {
 								aria-label={`Selecionar retirada em ${formatPickupSummaryDate(date)}`}
 								aria-pressed={isSelected}
 								className={cn(
-									"min-h-[7.5rem] rounded-[1.4rem] border px-3 py-3.5 text-center transition-all",
+									"min-h-30 rounded-[1.4rem] border px-3 py-3.5 text-center transition-all",
 									isSelected
 										? "border-rose-300 bg-[#fff2f4] text-slate-900 shadow-[0_18px_30px_-26px_rgba(216,98,126,0.28)]"
 										: "border-[#ece4e4] bg-[#fffdfb] text-slate-600 hover:border-rose-200 hover:bg-[#fff8f8]",
@@ -190,10 +192,8 @@ export function CheckoutPickupScheduler() {
 								dayjs(date).isBefore(pickupRange.from, "day") ||
 								dayjs(date).isAfter(pickupRange.to, "day")
 							}
-							fromDate={pickupRange.from}
 							locale={ptBR}
 							timeZone={timeZone}
-							toDate={pickupRange.to}
 						/>
 
 						<p className="px-2 pb-2 text-xs font-medium text-slate-500">

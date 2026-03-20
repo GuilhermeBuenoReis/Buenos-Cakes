@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { MapPin, ReceiptText } from "lucide-react";
 import { CartSheetArtwork } from "@/components/application/cart-sheet-artwork";
 import { Button } from "@/components/ui/button";
@@ -9,9 +10,24 @@ import { useCheckoutPickup } from "../_context/checkout-pickup-context";
 import { formatPickupSummaryDate } from "../_lib/checkout-pickup";
 import { CheckoutCard } from "./checkout-card";
 
-export function CheckoutOrderSummary() {
+interface CheckoutOrderSummaryProps {
+	actionDisabled?: boolean;
+	actionHref?: string;
+	actionLabel?: string;
+	disclaimer?: string;
+	hideAction?: boolean;
+}
+
+export function CheckoutOrderSummary({
+	actionDisabled,
+	actionHref,
+	actionLabel = "Finalizar Pedido",
+	disclaimer = "Ao finalizar, você concorda com nossos Termos de Serviço e Política de Cancelamento.",
+	hideAction = false,
+}: CheckoutOrderSummaryProps = {}) {
 	const { hasItems, items, shipping, subtotal, total } = useCartSheet();
 	const { pickupDate, pickupTime } = useCheckoutPickup();
+	const isActionDisabled = actionDisabled ?? !hasItems;
 
 	return (
 		<aside className="xl:sticky xl:top-6 xl:self-start">
@@ -119,18 +135,28 @@ export function CheckoutOrderSummary() {
 					</p>
 				</div>
 
-				<Button
-					className="mt-6 h-11 w-full rounded-full bg-[#d45470] text-white shadow-[0_18px_36px_-24px_rgba(212,84,112,0.45)] hover:bg-[#c64a65]"
-					disabled={!hasItems}
-					type="button"
-				>
-					Finalizar Pedido
-				</Button>
+				{hideAction ? null : actionHref && !isActionDisabled ? (
+					<Button
+						asChild
+						className="mt-6 h-11 w-full rounded-full bg-[#d45470] text-white shadow-[0_18px_36px_-24px_rgba(212,84,112,0.45)] hover:bg-[#c64a65]"
+					>
+						<Link href={actionHref}>{actionLabel}</Link>
+					</Button>
+				) : (
+					<Button
+						className="mt-6 h-11 w-full rounded-full bg-[#d45470] text-white shadow-[0_18px_36px_-24px_rgba(212,84,112,0.45)] hover:bg-[#c64a65]"
+						disabled={isActionDisabled}
+						type="button"
+					>
+						{actionLabel}
+					</Button>
+				)}
 
-				<p className="mt-3 text-center text-[11px] leading-5 text-slate-500">
-					Ao finalizar, você concorda com nossos Termos de Serviço e Política de
-					Cancelamento.
-				</p>
+				{hideAction ? null : (
+					<p className="mt-3 text-center text-[11px] leading-5 text-slate-500">
+						{disclaimer}
+					</p>
+				)}
 			</CheckoutCard>
 		</aside>
 	);

@@ -3,10 +3,8 @@ import "dayjs/locale/pt-br";
 
 dayjs.locale("pt-br");
 
-export const calendarDayKeyFormat = "YYYY-MM-DD";
-
 export function getCalendarDayKey(date: Date) {
-	return dayjs(date).format(calendarDayKeyFormat);
+	return dayjs(date).format("YYYY-MM-DD");
 }
 
 export { dayjs };

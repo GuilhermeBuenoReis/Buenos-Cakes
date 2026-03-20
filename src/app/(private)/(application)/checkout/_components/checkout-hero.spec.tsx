@@ -19,7 +19,21 @@ describe("CheckoutHero", () => {
 		).toBeVisible();
 		expect(screen.getByText("Etapa 1 de 3")).toBeVisible();
 		expect(screen.getByText("Identificação")).toBeVisible();
-		expect(screen.getByText("Retirada")).toBeVisible();
+		expect(screen.getByText("Pagamento")).toBeVisible();
 		expect(screen.getByText("Revisão")).toBeVisible();
+	});
+
+	it("renders the payment step as active with the payment breadcrumb", () => {
+		render(<CheckoutHero currentStep="pagamento" />);
+
+		expect(
+			screen.getByRole("heading", { name: "Pagamento do Pedido" }),
+		).toBeVisible();
+		expect(screen.getByText("Etapa 2 de 3")).toBeVisible();
+		expect(screen.getByRole("link", { name: "Checkout" })).toHaveAttribute(
+			"href",
+			"/checkout",
+		);
+		expect(screen.getAllByText("Pagamento").length).toBeGreaterThan(0);
 	});
 });

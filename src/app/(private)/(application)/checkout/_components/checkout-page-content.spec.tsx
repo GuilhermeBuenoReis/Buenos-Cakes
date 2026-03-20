@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { dayjs, getCalendarDayKey } from "@/lib/dayjs";
+import { CheckoutPickupProvider } from "../_context/checkout-pickup-context";
 
 const useCartSheetMock = vi.fn();
 
@@ -47,6 +48,14 @@ const baseCartSheetValue = {
 	total: 155,
 };
 
+function renderCheckoutPageContent() {
+	return render(
+		<CheckoutPickupProvider>
+			<CheckoutPageContent />
+		</CheckoutPickupProvider>,
+	);
+}
+
 describe("CheckoutPageContent", () => {
 	beforeEach(() => {
 		useCartSheetMock.mockReset();
@@ -54,7 +63,7 @@ describe("CheckoutPageContent", () => {
 	});
 
 	it("renders the checkout form and the order summary from cart items", () => {
-		render(<CheckoutPageContent />);
+		renderCheckoutPageContent();
 
 		expect(
 			screen.getByRole("heading", { name: "Finalizar Pedido" }),
@@ -73,16 +82,20 @@ describe("CheckoutPageContent", () => {
 		expect(
 			screen.getByRole("link", { name: "Voltar ao Carrinho" }),
 		).toHaveAttribute("href", "/products?cart=true");
+		expect(screen.getByRole("link", { name: "Próximo Passo" })).toHaveAttribute(
+			"href",
+			"/checkout/payment",
+		);
 		expect(
-			screen.getByRole("button", { name: "Finalizar Pedido" }),
-		).toBeEnabled();
+			screen.getByRole("link", { name: "Ir para Pagamento" }),
+		).toHaveAttribute("href", "/checkout/payment");
 	});
 
 	it("updates the pickup summary when selecting another date in the calendar and a time", async () => {
 		const user = userEvent.setup();
 		const nextWeekDate = dayjs(getInitialPickupDate()).add(9, "day").toDate();
 
-		render(<CheckoutPageContent />);
+		renderCheckoutPageContent();
 
 		fireEvent.change(screen.getByLabelText("Horário da retirada"), {
 			target: { value: "17:00" },
@@ -121,14 +134,14 @@ describe("CheckoutPageContent", () => {
 			total: 0,
 		});
 
-		render(<CheckoutPageContent />);
+		renderCheckoutPageContent();
 
 		expect(screen.getByText("Seu carrinho ainda está vazio.")).toBeVisible();
 		expect(
 			screen.getByRole("button", { name: "Próximo Passo" }),
 		).toBeDisabled();
 		expect(
-			screen.getByRole("button", { name: "Finalizar Pedido" }),
+			screen.getByRole("button", { name: "Ir para Pagamento" }),
 		).toBeDisabled();
 	});
 });
