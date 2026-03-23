@@ -22,18 +22,18 @@ interface AddCartSheetItemInput extends Omit<CartSheetItemData, "quantity"> {
 }
 
 interface CartSheetContextValue {
-	addItem: (item: AddCartSheetItemInput) => void;
-	decreaseQuantity: (itemId: string) => void;
+	items: CartSheetItemData[];
 	hasItems: boolean;
-	increaseQuantity: (itemId: string) => void;
 	itemCount: number;
 	isOpen: boolean;
-	items: CartSheetItemData[];
-	removeItem: (itemId: string) => void;
-	setIsOpen: (nextOpen: boolean) => void;
 	shipping: number;
 	subtotal: number;
 	total: number;
+	addItem: (item: AddCartSheetItemInput) => void;
+	decreaseQuantity: (itemId: string) => void;
+	increaseQuantity: (itemId: string) => void;
+	removeItem: (itemId: string) => void;
+	setIsOpen: (nextOpen: boolean) => void;
 }
 
 const SHIPPING_COST = 0;
@@ -44,12 +44,19 @@ function clampQuantity(quantity: number) {
 
 const CartSheetContext = createContext<CartSheetContextValue | null>(null);
 
-export function CartSheetProvider({ children }: PropsWithChildren) {
+interface CartSheetProviderProps extends PropsWithChildren {
+	initialItems?: CartSheetItemData[];
+}
+
+export function CartSheetProvider({
+	children,
+	initialItems = [],
+}: CartSheetProviderProps) {
 	const [isOpen, setCartOpen] = useQueryState(
 		"cart",
 		parseAsBoolean.withDefault(false),
 	);
-	const [items, setItems] = useState<CartSheetItemData[]>([]);
+	const [items, setItems] = useState<CartSheetItemData[]>(initialItems);
 
 	function setIsOpen(nextOpen: boolean) {
 		void setCartOpen(nextOpen);

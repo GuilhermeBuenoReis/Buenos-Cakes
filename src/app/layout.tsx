@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { CartSheetProvider } from "@/contexts/cart-sheet-context";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -14,7 +15,9 @@ export default function RootLayout({
 	return (
 		<html lang="en">
 			<body>
-				<NuqsAdapter>{children}</NuqsAdapter>
+				<NuqsAdapter>
+					<CartSheetProvider>{children}</CartSheetProvider>
+				</NuqsAdapter>
 			</body>
 		</html>
 	);

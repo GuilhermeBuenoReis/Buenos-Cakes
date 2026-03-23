@@ -27,8 +27,12 @@ function NavbarCartTrigger() {
 export function NavbarCart() {
 	const { isOpen, setIsOpen } = useCartSheet();
 
+	function handleOpenChange(nextOpen: boolean) {
+		setIsOpen(nextOpen);
+	}
+
 	return (
-		<Sheet open={isOpen} onOpenChange={setIsOpen}>
+		<Sheet open={isOpen} onOpenChange={handleOpenChange}>
 			<NavbarCartTrigger />
 			<CartSheetContent />
 		</Sheet>
