@@ -4,18 +4,13 @@ import { ArrowLeft, ArrowRight, UserRound } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useCartSheet } from "@/contexts/cart-sheet-context";
+import { checkoutPickupLocation } from "../_lib/checkout-pickup-location";
 import { CheckoutCard } from "./checkout-card";
 import { CheckoutHero } from "./checkout-hero";
 import { CheckoutOrderSummary } from "./checkout-order-summary";
 import { CheckoutPersonalInfoForm } from "./checkout-person-info-form";
 import { CheckoutPickupLocationCard } from "./checkout-pickup-location-card";
 import { CheckoutPickupScheduler } from "./checkout-pickup-scheduler";
-
-const pickupLocation = {
-	address: "Rua das Flores, 123 - Jardim Doce, São Paulo - SP",
-	name: "DoceGestão Matriz",
-	note: "Aberto hoje até as 19:00",
-};
 
 export function CheckoutPageContent() {
 	const { hasItems } = useCartSheet();
@@ -46,7 +41,7 @@ export function CheckoutPageContent() {
 					</CheckoutCard>
 
 					<CheckoutCard className="bg-[#fffdfa]">
-						<CheckoutPickupLocationCard location={pickupLocation} />
+						<CheckoutPickupLocationCard location={checkoutPickupLocation} />
 						<CheckoutPickupScheduler />
 					</CheckoutCard>
 

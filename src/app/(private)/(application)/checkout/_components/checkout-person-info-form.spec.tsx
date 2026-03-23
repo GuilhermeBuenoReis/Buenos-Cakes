@@ -1,11 +1,19 @@
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+import { CheckoutCustomerProvider } from "../_context/checkout-customer-context";
 import { CheckoutPersonalInfoForm } from "./checkout-person-info-form";
+
+function renderCheckoutPersonalInfoForm() {
+	return render(
+		<CheckoutCustomerProvider>
+			<CheckoutPersonalInfoForm />
+		</CheckoutCustomerProvider>,
+	);
+}
 
 describe("CheckoutPersonalInfoForm", () => {
 	it("renders the personal information fields with expected labels and placeholders", () => {
-		render(<CheckoutPersonalInfoForm />);
+		renderCheckoutPersonalInfoForm();
 
 		expect(screen.getByLabelText("Nome Completo")).toHaveAttribute(
 			"placeholder",
@@ -27,46 +35,49 @@ describe("CheckoutPersonalInfoForm", () => {
 	});
 
 	it("validates the fields with zod messages and clears them after valid input", async () => {
-		const user = userEvent.setup();
-
-		render(<CheckoutPersonalInfoForm />);
+		renderCheckoutPersonalInfoForm();
 
 		const fullNameInput = screen.getByLabelText("Nome Completo");
 		const emailInput = screen.getByLabelText("E-mail");
 		const phoneInput = screen.getByLabelText("WhatsApp / Telefone");
 
-		await user.click(fullNameInput);
-		await user.tab();
-		await user.type(emailInput, "ana");
-		await user.tab();
-		await user.type(phoneInput, "12345");
-		await user.tab();
+		fireEvent.blur(fullNameInput);
+		fireEvent.change(emailInput, { target: { value: "ana" } });
+		fireEvent.blur(emailInput);
+		fireEvent.change(phoneInput, { target: { value: "12345" } });
+		fireEvent.blur(phoneInput);
 
-		expect(screen.getByText("Informe seu nome completo.")).toBeVisible();
+		expect(await screen.findByText("Informe seu nome completo.")).toBeVisible();
 		expect(screen.getByText("Informe um e-mail válido.")).toBeVisible();
 		expect(screen.getByText("Informe um telefone válido.")).toBeVisible();
 		expect(fullNameInput).toHaveAttribute("aria-invalid", "true");
 		expect(emailInput).toHaveAttribute("aria-invalid", "true");
 		expect(phoneInput).toHaveAttribute("aria-invalid", "true");
 
-		await user.type(fullNameInput, "Ana Silva");
-		await user.clear(emailInput);
-		await user.type(emailInput, "ana.silva@exemplo.com");
-		await user.clear(phoneInput);
-		await user.type(phoneInput, "(11) 99999-9999");
-		await user.tab();
+		fireEvent.change(fullNameInput, { target: { value: "Ana Silva" } });
+		fireEvent.blur(fullNameInput);
+		fireEvent.change(emailInput, {
+			target: { value: "ana.silva@exemplo.com" },
+		});
+		fireEvent.blur(emailInput);
+		fireEvent.change(phoneInput, {
+			target: { value: "(11) 99999-9999" },
+		});
+		fireEvent.blur(phoneInput);
 
-		expect(
-			screen.queryByText("Informe seu nome completo."),
-		).not.toBeInTheDocument();
-		expect(
-			screen.queryByText("Informe um e-mail válido."),
-		).not.toBeInTheDocument();
-		expect(
-			screen.queryByText("Informe um telefone válido."),
-		).not.toBeInTheDocument();
-		expect(fullNameInput).toHaveAttribute("aria-invalid", "false");
-		expect(emailInput).toHaveAttribute("aria-invalid", "false");
-		expect(phoneInput).toHaveAttribute("aria-invalid", "false");
+		await waitFor(() => {
+			expect(
+				screen.queryByText("Informe seu nome completo."),
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByText("Informe um e-mail válido."),
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByText("Informe um telefone válido."),
+			).not.toBeInTheDocument();
+			expect(fullNameInput).toHaveAttribute("aria-invalid", "false");
+			expect(emailInput).toHaveAttribute("aria-invalid", "false");
+			expect(phoneInput).toHaveAttribute("aria-invalid", "false");
+		});
 	});
 });

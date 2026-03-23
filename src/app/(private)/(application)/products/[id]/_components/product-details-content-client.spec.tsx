@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NuqsTestingAdapter, type UrlUpdateEvent } from "nuqs/adapters/testing";
 import { describe, expect, it, vi } from "vitest";
@@ -143,7 +143,6 @@ describe("ProductDetailsContentClient", () => {
 	});
 
 	it("restores url state and limits the personalized message", async () => {
-		const user = userEvent.setup();
 		const cookieProduct: Product = {
 			...baseProduct,
 			category: "Cookies",
@@ -164,7 +163,9 @@ describe("ProductDetailsContentClient", () => {
 		});
 		const quantityInput = screen.getByLabelText("Quantidade");
 
-		await user.type(messageInput, "a".repeat(55));
+		fireEvent.change(messageInput, {
+			target: { value: `Parabens Maria${"a".repeat(55)}` },
+		});
 
 		expect(screen.getByText(`${cookieProduct.name} - Grande`)).toBeVisible();
 		expect(messageInput).toHaveValue(`Parabens Maria${"a".repeat(36)}`);

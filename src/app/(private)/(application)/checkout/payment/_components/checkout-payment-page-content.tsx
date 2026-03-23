@@ -1,20 +1,20 @@
 "use client";
 
 import { WalletCards } from "lucide-react";
-import { useState } from "react";
 import { CheckoutCard } from "../../_components/checkout-card";
 import { CheckoutHero } from "../../_components/checkout-hero";
 import { CheckoutOrderSummary } from "../../_components/checkout-order-summary";
+import { useCheckoutPayment } from "../../_context/checkout-payment-context";
 import { CheckoutNavigationFooter } from "./checkout-navigation-footer";
 import { PaymentDetailsCard } from "./payment-details-card";
 import { PaymentInfoCards } from "./payment-info-cards";
 import { PaymentMethodList } from "./payment-method-list";
+import { paymentMethods } from "./payment-methods";
 import { PaymentSummaryCard } from "./payment-summary-card";
-import { paymentMethods, type PaymentMethodId } from "./payment-methods";
 
 export function CheckoutPaymentPageContent() {
-	const [cashChange, setCashChange] = useState("");
-	const [selectedMethod, setSelectedMethod] = useState<PaymentMethodId>("pix");
+	const { cashChange, selectedMethod, setCashChange, setSelectedMethod } =
+		useCheckoutPayment();
 
 	const selectedPaymentMethod =
 		paymentMethods.find((method) => method.id === selectedMethod) ??

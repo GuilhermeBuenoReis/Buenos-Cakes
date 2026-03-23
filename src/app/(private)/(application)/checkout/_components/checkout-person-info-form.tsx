@@ -2,50 +2,25 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import { z } from "zod";
 import { Input } from "@/components/ui/input";
-
-export const checkoutPersonalInfoSchema = z.object({
-	email: z.email("Informe um e-mail válido."),
-	fullName: z
-		.string()
-		.trim()
-		.min(1, "Informe seu nome completo.")
-		.refine((value) => value.split(/\s+/).length >= 2, {
-			message: "Digite nome e sobrenome.",
-		}),
-	phone: z
-		.string()
-		.trim()
-		.min(1, "Informe seu telefone.")
-		.refine((value) => {
-			const digits = value.replace(/\D/g, "");
-			return digits.length >= 10 && digits.length <= 11;
-		}, "Informe um telefone válido."),
-});
-
-export type CheckoutPersonalInfoValues = z.infer<
-	typeof checkoutPersonalInfoSchema
->;
+import { useCheckoutCustomer } from "../_context/checkout-customer-context";
+import {
+	type CheckoutPersonalInfoValues,
+	checkoutPersonalInfoSchema,
+} from "../_lib/checkout-personal-info";
 
 export function CheckoutPersonalInfoForm() {
+	const { customerInfo, setCustomerInfo, updateCustomerInfo } =
+		useCheckoutCustomer();
 	const { control, handleSubmit } = useForm<CheckoutPersonalInfoValues>({
-		defaultValues: {
-			email: "",
-			fullName: "",
-			phone: "",
-		},
+		defaultValues: customerInfo,
 		mode: "onBlur",
 		reValidateMode: "onChange",
 		resolver: zodResolver(checkoutPersonalInfoSchema),
 	});
 
-	function handlePersonalInfoSubmit({
-		email,
-		fullName,
-		phone,
-	}: CheckoutPersonalInfoValues) {
-		console.log("Checkout personal info:", email, fullName, phone);
+	function handlePersonalInfoSubmit(values: CheckoutPersonalInfoValues) {
+		setCustomerInfo(values);
 	}
 
 	return (
@@ -77,7 +52,10 @@ export function CheckoutPersonalInfoForm() {
 								value={field.value}
 								variant="subtle"
 								onBlur={field.onBlur}
-								onChange={field.onChange}
+								onChange={(event) => {
+									field.onChange(event);
+									updateCustomerInfo({ fullName: event.target.value });
+								}}
 							/>
 							{fieldState.error ? (
 								<p
@@ -116,7 +94,10 @@ export function CheckoutPersonalInfoForm() {
 								value={field.value}
 								variant="subtle"
 								onBlur={field.onBlur}
-								onChange={field.onChange}
+								onChange={(event) => {
+									field.onChange(event);
+									updateCustomerInfo({ email: event.target.value });
+								}}
 							/>
 							{fieldState.error ? (
 								<p
@@ -155,7 +136,10 @@ export function CheckoutPersonalInfoForm() {
 								value={field.value}
 								variant="subtle"
 								onBlur={field.onBlur}
-								onChange={field.onChange}
+								onChange={(event) => {
+									field.onChange(event);
+									updateCustomerInfo({ phone: event.target.value });
+								}}
 							/>
 							{fieldState.error ? (
 								<p

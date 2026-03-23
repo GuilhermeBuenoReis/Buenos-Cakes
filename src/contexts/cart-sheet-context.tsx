@@ -44,12 +44,19 @@ function clampQuantity(quantity: number) {
 
 const CartSheetContext = createContext<CartSheetContextValue | null>(null);
 
-export function CartSheetProvider({ children }: PropsWithChildren) {
+interface CartSheetProviderProps extends PropsWithChildren {
+	initialItems?: CartSheetItemData[];
+}
+
+export function CartSheetProvider({
+	children,
+	initialItems = [],
+}: CartSheetProviderProps) {
 	const [isOpen, setCartOpen] = useQueryState(
 		"cart",
 		parseAsBoolean.withDefault(false),
 	);
-	const [items, setItems] = useState<CartSheetItemData[]>([]);
+	const [items, setItems] = useState<CartSheetItemData[]>(initialItems);
 
 	function setIsOpen(nextOpen: boolean) {
 		void setCartOpen(nextOpen);

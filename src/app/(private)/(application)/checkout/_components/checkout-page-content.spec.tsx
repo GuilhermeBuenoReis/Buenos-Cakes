@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { dayjs, getCalendarDayKey } from "@/lib/dayjs";
+import { CheckoutCustomerProvider } from "../_context/checkout-customer-context";
 import { CheckoutPickupProvider } from "../_context/checkout-pickup-context";
 
 const useCartSheetMock = vi.fn();
@@ -51,7 +52,9 @@ const baseCartSheetValue = {
 function renderCheckoutPageContent() {
 	return render(
 		<CheckoutPickupProvider>
-			<CheckoutPageContent />
+			<CheckoutCustomerProvider>
+				<CheckoutPageContent />
+			</CheckoutCustomerProvider>
 		</CheckoutPickupProvider>,
 	);
 }
@@ -93,7 +96,7 @@ describe("CheckoutPageContent", () => {
 
 	it("updates the pickup summary when selecting another date in the calendar and a time", async () => {
 		const user = userEvent.setup();
-		const nextWeekDate = dayjs(getInitialPickupDate()).add(9, "day").toDate();
+		const calendarOnlyDate = dayjs(getInitialPickupDate()).add(7, "day").toDate();
 
 		renderCheckoutPageContent();
 
@@ -106,7 +109,7 @@ describe("CheckoutPageContent", () => {
 
 		const calendarPanel = screen.getByTestId("pickup-calendar-panel");
 		const nextWeekButton = calendarPanel.querySelector<HTMLButtonElement>(
-			`button[data-day="${getCalendarDayKey(nextWeekDate)}"]`,
+			`button[data-day="${getCalendarDayKey(calendarOnlyDate)}"]`,
 		);
 
 		expect(nextWeekButton).not.toBeNull();
@@ -117,7 +120,7 @@ describe("CheckoutPageContent", () => {
 		await user.click(nextWeekButton);
 
 		expect(screen.getByTestId("pickup-date-summary")).toHaveTextContent(
-			formatPickupSummaryDate(nextWeekDate),
+			formatPickupSummaryDate(calendarOnlyDate),
 		);
 		expect(screen.getByTestId("pickup-schedule-summary")).toHaveTextContent(
 			"Às 17:00",

@@ -38,7 +38,7 @@ describe("CheckoutPickupScheduler", () => {
 
 	it("opens the calendar and allows selecting a date from the next week", async () => {
 		const user = userEvent.setup();
-		const nextWeekDate = dayjs(getInitialPickupDate()).add(9, "day").toDate();
+		const calendarOnlyDate = dayjs(getInitialPickupDate()).add(7, "day").toDate();
 
 		renderCheckoutPickupScheduler();
 
@@ -48,7 +48,7 @@ describe("CheckoutPickupScheduler", () => {
 
 		const calendarPanel = screen.getByTestId("pickup-calendar-panel");
 		const nextWeekButton = calendarPanel.querySelector<HTMLButtonElement>(
-			`button[data-day="${getCalendarDayKey(nextWeekDate)}"]`,
+			`button[data-day="${getCalendarDayKey(calendarOnlyDate)}"]`,
 		);
 
 		expect(nextWeekButton).not.toBeNull();
@@ -62,7 +62,7 @@ describe("CheckoutPickupScheduler", () => {
 			screen.queryByTestId("pickup-calendar-panel"),
 		).not.toBeInTheDocument();
 		expect(
-			screen.getAllByText(formatPickupSummaryDate(nextWeekDate)).length,
+			screen.getAllByText(formatPickupSummaryDate(calendarOnlyDate)).length,
 		).toBeGreaterThanOrEqual(1);
 	});
 

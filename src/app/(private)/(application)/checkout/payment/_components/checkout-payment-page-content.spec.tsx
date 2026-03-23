@@ -1,54 +1,30 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { CheckoutPickupProvider } from "../_context/checkout-pickup-context";
-
-const useCartSheetMock = vi.fn();
-
-vi.mock("@/contexts/cart-sheet-context", () => ({
-	useCartSheet: () => useCartSheetMock(),
-}));
-
-import { CheckoutPaymentPageContent } from "../payment/_components/checkout-payment-page-content";
-
-const baseCartSheetValue = {
-	addItem: vi.fn(),
-	decreaseQuantity: vi.fn(),
-	hasItems: true,
-	increaseQuantity: vi.fn(),
-	isOpen: false,
-	itemCount: 3,
-	items: [
-		{
-			highlight: "Bolos",
-			id: "prd_1",
-			image: "https://images.unsplash.com/photo-1606890737304-57a1ca8a5b62",
-			name: "Bolo de Chocolate Belga",
-			quantity: 1,
-			unitPrice: 85,
-		},
-	],
-	removeItem: vi.fn(),
-	setIsOpen: vi.fn(),
-	shipping: 0,
-	subtotal: 85,
-	total: 85,
-};
+import { NuqsTestingAdapter } from "nuqs/adapters/testing";
+import { describe, expect, it } from "vitest";
+import { CartSheetProvider } from "@/contexts/cart-sheet-context";
+import { createCartItemFromCatalog } from "@/test/catalog-seed";
+import { CheckoutPaymentProvider } from "../../_context/checkout-payment-context";
+import { CheckoutPickupProvider } from "../../_context/checkout-pickup-context";
+import { CheckoutPaymentPageContent } from "./checkout-payment-page-content";
 
 function renderCheckoutPaymentPageContent() {
 	return render(
-		<CheckoutPickupProvider>
-			<CheckoutPaymentPageContent />
-		</CheckoutPickupProvider>,
+		<NuqsTestingAdapter hasMemory>
+			<CartSheetProvider
+				initialItems={[createCartItemFromCatalog("prd_8f3a92c1")]}
+			>
+				<CheckoutPickupProvider>
+					<CheckoutPaymentProvider>
+						<CheckoutPaymentPageContent />
+					</CheckoutPaymentProvider>
+				</CheckoutPickupProvider>
+			</CartSheetProvider>
+		</NuqsTestingAdapter>,
 	);
 }
 
 describe("CheckoutPaymentPageContent", () => {
-	beforeEach(() => {
-		useCartSheetMock.mockReset();
-		useCartSheetMock.mockReturnValue(baseCartSheetValue);
-	});
-
 	it("renders the payment step and main payment methods", () => {
 		renderCheckoutPaymentPageContent();
 
@@ -62,6 +38,9 @@ describe("CheckoutPaymentPageContent", () => {
 		expect(
 			screen.getByRole("link", { name: "Voltar para os dados" }),
 		).toHaveAttribute("href", "/checkout");
+		expect(
+			screen.getByRole("link", { name: "Continuar para revisão" }),
+		).toHaveAttribute("href", "/checkout/review");
 		expect(screen.getByText("Antes de continuar")).toBeVisible();
 	});
 
