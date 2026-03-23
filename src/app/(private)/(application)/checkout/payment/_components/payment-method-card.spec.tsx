@@ -8,9 +8,9 @@ describe("PaymentMethodCard", () => {
 	it("renders the selected method as checked", () => {
 		render(
 			<PaymentMethodCard
+				handleSelectMethod={vi.fn()}
 				isSelected
 				method={paymentMethods[0]}
-				onSelect={vi.fn()}
 			/>,
 		);
 
@@ -21,18 +21,18 @@ describe("PaymentMethodCard", () => {
 
 	it("calls onSelect when another payment method is chosen", async () => {
 		const user = userEvent.setup();
-		const onSelect = vi.fn();
+		const handleSelectMethod = vi.fn();
 
 		render(
 			<PaymentMethodCard
+				handleSelectMethod={handleSelectMethod}
 				isSelected={false}
 				method={paymentMethods[2]}
-				onSelect={onSelect}
 			/>,
 		);
 
 		await user.click(screen.getByRole("radio", { name: /Cartão de débito/i }));
 
-		expect(onSelect).toHaveBeenCalledWith("debit-card");
+		expect(handleSelectMethod).toHaveBeenCalledWith("debit-card");
 	});
 });

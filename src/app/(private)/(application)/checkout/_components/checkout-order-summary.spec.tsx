@@ -1,11 +1,16 @@
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { CheckoutCustomerProvider } from "../_context/checkout-customer-context";
 import { CheckoutPickupProvider } from "../_context/checkout-pickup-context";
 
 const useCartSheetMock = vi.fn();
 
 vi.mock("@/contexts/cart-sheet-context", () => ({
 	useCartSheet: () => useCartSheetMock(),
+}));
+
+vi.mock("next/navigation", () => ({
+	usePathname: () => "/checkout",
 }));
 
 import { CheckoutOrderSummary } from "./checkout-order-summary";
@@ -45,7 +50,9 @@ const baseCartSheetValue = {
 function renderCheckoutOrderSummary() {
 	return render(
 		<CheckoutPickupProvider>
-			<CheckoutOrderSummary />
+			<CheckoutCustomerProvider>
+				<CheckoutOrderSummary />
+			</CheckoutCustomerProvider>
 		</CheckoutPickupProvider>,
 	);
 }
@@ -76,7 +83,7 @@ describe("CheckoutOrderSummary", () => {
 			"Às 14:00",
 		);
 		expect(
-			screen.getByRole("button", { name: "Finalizar Pedido" }),
+			screen.getByRole("button", { name: "Ir para Pagamento" }),
 		).toBeEnabled();
 	});
 
@@ -95,7 +102,7 @@ describe("CheckoutOrderSummary", () => {
 		expect(screen.getByText("Seu carrinho ainda está vazio.")).toBeVisible();
 		expect(screen.queryByText("items")).not.toBeInTheDocument();
 		expect(
-			screen.getByRole("button", { name: "Finalizar Pedido" }),
+			screen.getByRole("button", { name: "Ir para Pagamento" }),
 		).toBeDisabled();
 		expect(screen.getAllByText("R$ 0,00")).toHaveLength(2);
 	});

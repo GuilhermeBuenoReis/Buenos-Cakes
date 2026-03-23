@@ -38,6 +38,21 @@ export function CatalogHeader() {
 		reset({ sortValue });
 	}, [reset, sortValue]);
 
+	function handleSortValueChange(
+		field: {
+			onChange: (value: CatalogSort["sortValue"]) => void;
+			value: CatalogSort["sortValue"];
+		},
+		nextValue: string,
+	) {
+		const parsedValue = catalogSortSchema.shape.sortValue.safeParse(nextValue);
+		if (!parsedValue.success) return;
+
+		field.onChange(parsedValue.data);
+		setSortValue(parsedValue.data);
+		setCurrentPage(1);
+	}
+
 	return (
 		<header className="flex flex-wrap items-end justify-between gap-2">
 			<div>
@@ -57,34 +72,29 @@ export function CatalogHeader() {
 				<Controller
 					name="sortValue"
 					control={control}
-					render={({ field }) => (
-						<Select
-							value={field.value}
-							onValueChange={(nextValue) => {
-								const parsedValue =
-									catalogSortSchema.shape.sortValue.safeParse(nextValue);
-								if (!parsedValue.success) return;
+					render={({ field }) => {
+						function handleValueChange(nextValue: string) {
+							handleSortValueChange(field, nextValue);
+						}
 
-								field.onChange(parsedValue.data);
-								setSortValue(parsedValue.data);
-								setCurrentPage(1);
-							}}
-						>
-							<SelectTrigger
-								size="sm"
-								className="rounded-md border-rose-200 bg-rose-50 px-2.5 text-xs font-medium text-slate-700 focus-visible:border-rose-300 focus-visible:ring-rose-100 sm:text-sm"
-							>
-								<SelectValue />
-							</SelectTrigger>
-							<SelectContent className="border-rose-100">
-								{sortOptions.map((option) => (
-									<SelectItem key={option.value} value={option.value}>
-										{option.label}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-					)}
+						return (
+							<Select value={field.value} onValueChange={handleValueChange}>
+								<SelectTrigger
+									size="sm"
+									className="rounded-md border-rose-200 bg-rose-50 px-2.5 text-xs font-medium text-slate-700 focus-visible:border-rose-300 focus-visible:ring-rose-100 sm:text-sm"
+								>
+									<SelectValue />
+								</SelectTrigger>
+								<SelectContent className="border-rose-100">
+									{sortOptions.map((option) => (
+										<SelectItem key={option.value} value={option.value}>
+											{option.label}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+						);
+					}}
 				/>
 			</div>
 		</header>

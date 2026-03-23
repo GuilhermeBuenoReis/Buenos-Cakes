@@ -1,6 +1,7 @@
 "use client";
 
 import { CalendarDays, Clock3 } from "lucide-react";
+import type { ChangeEvent } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { ptBR } from "react-day-picker/locale";
 import { Button } from "@/components/ui/button";
@@ -81,6 +82,28 @@ export function CheckoutPickupScheduler() {
 		dayjs(date).isSame(pickupDate, "day"),
 	);
 
+	function handleQuickPickDateClick(date: Date) {
+		setPickupDate(date);
+		setIsCalendarOpen(false);
+	}
+
+	function handleCalendarToggleClick() {
+		setIsCalendarOpen((current) => !current);
+	}
+
+	function handleCalendarDateSelect(date: Date | undefined) {
+		if (!date) {
+			return;
+		}
+
+		setPickupDate(dayjs(date).startOf("day").toDate());
+		setIsCalendarOpen(false);
+	}
+
+	function handlePickupTimeChange(event: ChangeEvent<HTMLInputElement>) {
+		setPickupTime(event.target.value);
+	}
+
 	return (
 		<div className="mt-6 space-y-6">
 			<div className="space-y-4">
@@ -92,6 +115,10 @@ export function CheckoutPickupScheduler() {
 				<div className="grid grid-cols-2 gap-3 sm:grid-cols-4 xl:grid-cols-7">
 					{quickPickDates.map((date) => {
 						const isSelected = dayjs(date).isSame(pickupDate, "day");
+
+						function handleQuickPickButtonClick() {
+							handleQuickPickDateClick(date);
+						}
 
 						return (
 							<button
@@ -105,10 +132,7 @@ export function CheckoutPickupScheduler() {
 										: "border-[#ece4e4] bg-[#fffdfb] text-slate-600 hover:border-rose-200 hover:bg-[#fff8f8]",
 								)}
 								key={getCalendarDayKey(date)}
-								onClick={() => {
-									setPickupDate(date);
-									setIsCalendarOpen(false);
-								}}
+								onClick={handleQuickPickButtonClick}
 							>
 								<div
 									className={cn(
@@ -164,7 +188,7 @@ export function CheckoutPickupScheduler() {
 						className="mt-4 h-11 rounded-full border-[#e7dfdf] bg-white px-5 text-slate-700 shadow-[0_12px_26px_-24px_rgba(15,23,42,0.18)] hover:border-rose-200 hover:bg-white hover:text-rose-500"
 						type="button"
 						variant="outline"
-						onClick={() => setIsCalendarOpen((current) => !current)}
+						onClick={handleCalendarToggleClick}
 					>
 						Escolher no calendário
 					</Button>
@@ -178,14 +202,7 @@ export function CheckoutPickupScheduler() {
 						<Calendar
 							mode="single"
 							selected={pickupDate}
-							onSelect={(date) => {
-								if (!date) {
-									return;
-								}
-
-								setPickupDate(dayjs(date).startOf("day").toDate());
-								setIsCalendarOpen(false);
-							}}
+							onSelect={handleCalendarDateSelect}
 							buttonVariant="ghost"
 							className="w-full rounded-[1.4rem] bg-[#fffdfa] p-4 [--cell-size:2.65rem] sm:[--cell-size:2.85rem]"
 							disabled={(date) =>
@@ -232,7 +249,7 @@ export function CheckoutPickupScheduler() {
 							step={pickupStepInSeconds}
 							type="time"
 							value={pickupTime}
-							onChange={(event) => setPickupTime(event.target.value)}
+							onChange={handlePickupTimeChange}
 						/>
 					</div>
 

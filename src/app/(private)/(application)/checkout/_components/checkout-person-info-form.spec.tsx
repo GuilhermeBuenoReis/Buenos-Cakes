@@ -1,7 +1,13 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { CheckoutCustomerProvider } from "../_context/checkout-customer-context";
 import { CheckoutPersonalInfoForm } from "./checkout-person-info-form";
+
+vi.mock("next/navigation", () => ({
+	useRouter: () => ({
+		push: vi.fn(),
+	}),
+}));
 
 function renderCheckoutPersonalInfoForm() {
 	return render(

@@ -1,12 +1,17 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NuqsTestingAdapter } from "nuqs/adapters/testing";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { CartSheetProvider } from "@/contexts/cart-sheet-context";
 import { createCartItemFromCatalog } from "@/test/catalog-seed";
+import { CheckoutCustomerProvider } from "../../_context/checkout-customer-context";
 import { CheckoutPaymentProvider } from "../../_context/checkout-payment-context";
 import { CheckoutPickupProvider } from "../../_context/checkout-pickup-context";
 import { CheckoutPaymentPageContent } from "./checkout-payment-page-content";
+
+vi.mock("next/navigation", () => ({
+	usePathname: () => "/checkout/payment",
+}));
 
 function renderCheckoutPaymentPageContent() {
 	return render(
@@ -15,9 +20,11 @@ function renderCheckoutPaymentPageContent() {
 				initialItems={[createCartItemFromCatalog("prd_8f3a92c1")]}
 			>
 				<CheckoutPickupProvider>
-					<CheckoutPaymentProvider>
-						<CheckoutPaymentPageContent />
-					</CheckoutPaymentProvider>
+					<CheckoutCustomerProvider>
+						<CheckoutPaymentProvider>
+							<CheckoutPaymentPageContent />
+						</CheckoutPaymentProvider>
+					</CheckoutCustomerProvider>
 				</CheckoutPickupProvider>
 			</CartSheetProvider>
 		</NuqsTestingAdapter>,
@@ -42,6 +49,9 @@ describe("CheckoutPaymentPageContent", () => {
 			screen.getByRole("link", { name: "Continuar para revisão" }),
 		).toHaveAttribute("href", "/checkout/review");
 		expect(screen.getByText("Antes de continuar")).toBeVisible();
+		expect(
+			screen.queryByRole("button", { name: "Ir para Pagamento" }),
+		).not.toBeInTheDocument();
 	});
 
 	it("shows the cash change input when selecting cash", async () => {

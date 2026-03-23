@@ -4,6 +4,7 @@ import {
 	createContext,
 	type PropsWithChildren,
 	useContext,
+	useRef,
 	useState,
 } from "react";
 import {
@@ -13,6 +14,10 @@ import {
 
 interface CheckoutCustomerContextValue {
 	customerInfo: CheckoutPersonalInfoValues;
+	registerSubmitCustomerInfo: (
+		nextSubmitCustomerInfo: (() => void) | null,
+	) => void;
+	handleSubmitCustomerInfo: () => void;
 	setCustomerInfo: (nextCustomerInfo: CheckoutPersonalInfoValues) => void;
 	updateCustomerInfo: (
 		nextCustomerInfo: Partial<CheckoutPersonalInfoValues>,
@@ -31,6 +36,17 @@ export function CheckoutCustomerProvider({
 	initialCustomerInfo = defaultCheckoutPersonalInfoValues,
 }: CheckoutCustomerProviderProps) {
 	const [customerInfo, setCustomerInfoState] = useState(initialCustomerInfo);
+	const customerInfoSubmitRef = useRef<(() => void) | null>(null);
+
+	function registerSubmitCustomerInfo(
+		nextSubmitCustomerInfo: (() => void) | null,
+	) {
+		customerInfoSubmitRef.current = nextSubmitCustomerInfo;
+	}
+
+	function handleSubmitCustomerInfo() {
+		customerInfoSubmitRef.current?.();
+	}
 
 	function setCustomerInfo(nextCustomerInfo: CheckoutPersonalInfoValues) {
 		setCustomerInfoState(nextCustomerInfo);
@@ -49,6 +65,8 @@ export function CheckoutCustomerProvider({
 		<CheckoutCustomerContext.Provider
 			value={{
 				customerInfo,
+				handleSubmitCustomerInfo,
+				registerSubmitCustomerInfo,
 				setCustomerInfo,
 				updateCustomerInfo,
 			}}

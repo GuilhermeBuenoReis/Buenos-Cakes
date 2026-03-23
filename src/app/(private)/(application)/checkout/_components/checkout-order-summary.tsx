@@ -1,33 +1,25 @@
 "use client";
 
 import { MapPin, ReceiptText } from "lucide-react";
-import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { CartSheetArtwork } from "@/components/application/cart-sheet-artwork";
 import { Button } from "@/components/ui/button";
 import { useCartSheet } from "@/contexts/cart-sheet-context";
 import { formatPrice } from "@/lib/format-price";
+import { useCheckoutCustomer } from "../_context/checkout-customer-context";
 import { useCheckoutPickup } from "../_context/checkout-pickup-context";
 import { formatPickupSummaryDate } from "../_lib/checkout-pickup";
 import { CheckoutCard } from "./checkout-card";
 
-interface CheckoutOrderSummaryProps {
-	actionDisabled?: boolean;
-	actionHref?: string;
-	actionLabel?: string;
-	disclaimer?: string;
-	hideAction?: boolean;
-}
+const checkoutOrderSummaryDisclaimer =
+	"Ao finalizar, você concorda com nossos Termos de Serviço e Política de Cancelamento.";
 
-export function CheckoutOrderSummary({
-	actionDisabled,
-	actionHref,
-	actionLabel = "Finalizar Pedido",
-	disclaimer = "Ao finalizar, você concorda com nossos Termos de Serviço e Política de Cancelamento.",
-	hideAction = false,
-}: CheckoutOrderSummaryProps = {}) {
+export function CheckoutOrderSummary() {
 	const { hasItems, items, shipping, subtotal, total } = useCartSheet();
+	const pathname = usePathname();
+	const { handleSubmitCustomerInfo } = useCheckoutCustomer();
 	const { pickupDate, pickupTime } = useCheckoutPickup();
-	const isActionDisabled = actionDisabled ?? !hasItems;
+	const shouldShowAction = pathname === "/checkout";
 
 	return (
 		<aside className="xl:sticky xl:top-6 xl:self-start">
@@ -135,28 +127,22 @@ export function CheckoutOrderSummary({
 					</p>
 				</div>
 
-				{hideAction ? null : actionHref && !isActionDisabled ? (
-					<Button
-						asChild
-						className="mt-6 h-11 w-full rounded-full bg-[#d45470] text-white shadow-[0_18px_36px_-24px_rgba(212,84,112,0.45)] hover:bg-[#c64a65]"
-					>
-						<Link href={actionHref}>{actionLabel}</Link>
-					</Button>
-				) : (
+				{shouldShowAction ? (
 					<Button
 						className="mt-6 h-11 w-full rounded-full bg-[#d45470] text-white shadow-[0_18px_36px_-24px_rgba(212,84,112,0.45)] hover:bg-[#c64a65]"
-						disabled={isActionDisabled}
+						disabled={!hasItems}
 						type="button"
+						onClick={handleSubmitCustomerInfo}
 					>
-						{actionLabel}
+						Ir para Pagamento
 					</Button>
-				)}
+				) : null}
 
-				{hideAction ? null : (
+				{shouldShowAction ? (
 					<p className="mt-3 text-center text-[11px] leading-5 text-slate-500">
-						{disclaimer}
+						{checkoutOrderSummaryDisclaimer}
 					</p>
-				)}
+				) : null}
 			</CheckoutCard>
 		</aside>
 	);

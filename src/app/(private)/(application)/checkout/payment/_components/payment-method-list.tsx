@@ -4,15 +4,15 @@ import { PaymentMethodCard } from "./payment-method-card";
 import type { PaymentMethod, PaymentMethodId } from "./payment-methods";
 
 interface PaymentMethodListProps {
+	handleSelectMethod: (methodId: PaymentMethodId) => void;
 	methods: PaymentMethod[];
 	selectedMethod: PaymentMethodId;
-	onSelect: (methodId: PaymentMethodId) => void;
 }
 
 export function PaymentMethodList({
+	handleSelectMethod,
 	methods,
 	selectedMethod,
-	onSelect,
 }: PaymentMethodListProps) {
 	return (
 		<div
@@ -22,10 +22,10 @@ export function PaymentMethodList({
 		>
 			{methods.map((method) => (
 				<PaymentMethodCard
+					handleSelectMethod={handleSelectMethod}
 					isSelected={selectedMethod === method.id}
 					key={method.id}
 					method={method}
-					onSelect={onSelect}
 				/>
 			))}
 		</div>

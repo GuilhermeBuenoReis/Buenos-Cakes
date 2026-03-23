@@ -31,8 +31,8 @@ test.describe("Checkout", () => {
 		await expect(page.getByText("Qtd. 1")).toBeVisible();
 		await expect(page.getByText("1 item")).toBeVisible();
 		await expect(
-			page.getByRole("link", { name: "Ir para Pagamento" }),
-		).toHaveAttribute("href", "/checkout/payment");
+			page.getByRole("button", { name: "Ir para Pagamento" }),
+		).toBeVisible();
 	});
 
 	test("shows the empty state and disabled actions when opening checkout without cart items", async ({
@@ -63,7 +63,9 @@ test.describe("Checkout", () => {
 		const calendarPanel = page.getByTestId("pickup-calendar-panel");
 		await expect(calendarPanel).toBeVisible();
 
-		const calendarOnlyDate = dayjs(getInitialPickupDate()).add(7, "day").toDate();
+		const calendarOnlyDate = dayjs(getInitialPickupDate())
+			.add(7, "day")
+			.toDate();
 
 		await calendarPanel
 			.locator(
@@ -102,13 +104,36 @@ test.describe("Checkout", () => {
 			.click();
 
 		await page.getByRole("button", { name: "Finalizar Pedido" }).click();
-		await page.getByRole("link", { name: "Próximo Passo" }).click();
+		await page.getByLabel("Nome Completo").fill("Ana Beatriz Souza");
+		await page.getByLabel("E-mail").fill("ana.souza@exemplo.com");
+		await page.getByLabel("WhatsApp / Telefone").fill("(11) 99876-5432");
+		await page.getByRole("button", { name: "Próximo Passo" }).click();
 
 		await expect(page).toHaveURL(/\/checkout\/payment$/);
 		await expect(
 			page.getByRole("heading", { name: "Pagamento do Pedido" }),
 		).toBeVisible();
 		await expect(page.getByText("Escolha como deseja pagar")).toBeVisible();
+	});
+
+	test("stays on checkout and shows validation errors when personal info is missing", async ({
+		page,
+	}) => {
+		await page.goto("/products");
+
+		await page
+			.getByRole("button", {
+				name: "Adicionar Bolo Red Velvet Premium ao carrinho",
+			})
+			.click();
+
+		await page.getByRole("button", { name: "Finalizar Pedido" }).click();
+		await page.getByRole("button", { name: "Próximo Passo" }).click();
+
+		await expect(page).toHaveURL(/\/checkout$/);
+		await expect(page.getByText("Informe seu nome completo.")).toBeVisible();
+		await expect(page.getByText("Informe um e-mail válido.")).toBeVisible();
+		await expect(page.getByText("Informe seu telefone.")).toBeVisible();
 	});
 
 	test("reviews the collected order data before confirmation", async ({
@@ -128,7 +153,7 @@ test.describe("Checkout", () => {
 		await page.getByLabel("E-mail").fill("ana.souza@exemplo.com");
 		await page.getByLabel("WhatsApp / Telefone").fill("(11) 99876-5432");
 
-		await page.getByRole("link", { name: "Próximo Passo" }).click();
+		await page.getByRole("button", { name: "Próximo Passo" }).click();
 		await expect(page).toHaveURL(/\/checkout\/payment$/);
 
 		await page.locator("label").filter({ hasText: "Cartão de débito" }).click();

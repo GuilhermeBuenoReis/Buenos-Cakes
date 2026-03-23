@@ -1,7 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
 	CircleDollarSign,
@@ -13,8 +11,10 @@ import {
 import Link from "next/link";
 import type { MouseEvent } from "react";
 import { useEffect, useMemo } from "react";
-import { type SubmitHandler, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useProductsCatalog } from "../_context/products-catalog-context";
 
 const sidebarFiltersSchema = z.object({
@@ -62,6 +62,7 @@ export function Sidebar() {
 		() => `R$ ${watchedMaxPrice ?? maxPrice}+`,
 		[maxPrice, watchedMaxPrice],
 	);
+	const watchedRating = watch("rating");
 
 	useEffect(() => {
 		reset({
@@ -77,11 +78,27 @@ export function Sidebar() {
 		setCurrentPage(1);
 	}
 
-	const handleApplyFiltersSubmit: SubmitHandler<SidebarFilters> = (values) => {
+	function handleApplyFiltersSubmit(values: SidebarFilters) {
 		setMaxPrice(values.maxPrice);
 		setRating(values.rating);
 		setCurrentPage(1);
-	};
+	}
+
+	function handleFourStarRatingChange() {
+		setValue("rating", 4, {
+			shouldDirty: true,
+			shouldTouch: true,
+			shouldValidate: true,
+		});
+	}
+
+	function handleThreeStarRatingChange() {
+		setValue("rating", 3, {
+			shouldDirty: true,
+			shouldTouch: true,
+			shouldValidate: true,
+		});
+	}
 
 	return (
 		<aside className="h-full min-w-52.5 rounded-2xl border border-rose-100/70 bg-linear-to-b from-white to-rose-50/35 p-3 shadow-[0_14px_32px_-26px_rgba(15,23,42,0.45)]">
@@ -179,14 +196,8 @@ export function Sidebar() {
 								type="radio"
 								name="rating"
 								value={4}
-								checked={watch("rating") === 4}
-								onChange={() =>
-									setValue("rating", 4, {
-										shouldDirty: true,
-										shouldTouch: true,
-										shouldValidate: true,
-									})
-								}
+								checked={watchedRating === 4}
+								onChange={handleFourStarRatingChange}
 								aria-label="Avaliação mínima de 4 estrelas"
 								className="h-3 w-3 appearance-auto border-0 bg-transparent p-0 accent-rose-500 shadow-none focus-visible:ring-0"
 							/>
@@ -199,14 +210,8 @@ export function Sidebar() {
 								type="radio"
 								name="rating"
 								value={3}
-								checked={watch("rating") === 3}
-								onChange={() =>
-									setValue("rating", 3, {
-										shouldDirty: true,
-										shouldTouch: true,
-										shouldValidate: true,
-									})
-								}
+								checked={watchedRating === 3}
+								onChange={handleThreeStarRatingChange}
 								aria-label="Avaliação mínima de 3 estrelas"
 								className="h-3 w-3 appearance-auto border-0 bg-transparent p-0 accent-rose-500 shadow-none focus-visible:ring-0"
 							/>

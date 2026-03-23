@@ -20,6 +20,16 @@ export function CheckoutPaymentPageContent() {
 		paymentMethods.find((method) => method.id === selectedMethod) ??
 		paymentMethods[0];
 
+	function handleCashChange(nextCashChange: string) {
+		setCashChange(nextCashChange);
+	}
+
+	function handleSelectMethod(
+		nextMethod: (typeof paymentMethods)[number]["id"],
+	) {
+		setSelectedMethod(nextMethod);
+	}
+
 	return (
 		<div className="relative space-y-7 pb-6">
 			<div className="pointer-events-none absolute inset-x-0 top-4 -z-10 h-56 rounded-[2.5rem] bg-[radial-gradient(circle_at_top_right,rgba(225,105,135,0.1),transparent_36%),radial-gradient(circle_at_left,rgba(148,163,184,0.08),transparent_26%)]" />
@@ -44,9 +54,9 @@ export function CheckoutPaymentPageContent() {
 						</div>
 
 						<PaymentMethodList
+							handleSelectMethod={handleSelectMethod}
 							methods={paymentMethods}
 							selectedMethod={selectedMethod}
-							onSelect={setSelectedMethod}
 						/>
 
 						<div className="mt-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_18rem]">
@@ -55,8 +65,8 @@ export function CheckoutPaymentPageContent() {
 							/>
 							<PaymentDetailsCard
 								cashChange={cashChange}
+								handleCashChange={handleCashChange}
 								selectedPaymentMethod={selectedPaymentMethod}
-								onCashChange={setCashChange}
 							/>
 						</div>
 					</CheckoutCard>
@@ -65,7 +75,7 @@ export function CheckoutPaymentPageContent() {
 					<CheckoutNavigationFooter />
 				</div>
 
-				<CheckoutOrderSummary hideAction />
+				<CheckoutOrderSummary />
 			</div>
 		</div>
 	);

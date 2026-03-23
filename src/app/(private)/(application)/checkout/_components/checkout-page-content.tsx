@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, UserRound } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useCartSheet } from "@/contexts/cart-sheet-context";
+import { useCheckoutCustomer } from "../_context/checkout-customer-context";
 import { checkoutPickupLocation } from "../_lib/checkout-pickup-location";
 import { CheckoutCard } from "./checkout-card";
 import { CheckoutHero } from "./checkout-hero";
@@ -14,6 +15,7 @@ import { CheckoutPickupScheduler } from "./checkout-pickup-scheduler";
 
 export function CheckoutPageContent() {
 	const { hasItems } = useCartSheet();
+	const { handleSubmitCustomerInfo } = useCheckoutCustomer();
 
 	return (
 		<div className="relative space-y-7 pb-6">
@@ -54,33 +56,19 @@ export function CheckoutPageContent() {
 							Voltar ao Carrinho
 						</Link>
 
-						{hasItems ? (
-							<Button
-								asChild
-								className="h-11 rounded-full bg-[#d45470] px-6 text-white shadow-[0_18px_36px_-24px_rgba(212,84,112,0.45)] hover:bg-[#c74a65]"
-							>
-								<Link href="/checkout/payment">
-									Próximo Passo
-									<ArrowRight className="size-4" />
-								</Link>
-							</Button>
-						) : (
-							<Button
-								className="h-11 rounded-full bg-[#d45470] px-6 text-white shadow-[0_18px_36px_-24px_rgba(212,84,112,0.45)] hover:bg-[#c74a65]"
-								disabled
-								type="button"
-							>
-								Próximo Passo
-								<ArrowRight className="size-4" />
-							</Button>
-						)}
+						<Button
+							className="h-11 rounded-full bg-[#d45470] px-6 text-white shadow-[0_18px_36px_-24px_rgba(212,84,112,0.45)] hover:bg-[#c74a65]"
+							disabled={!hasItems}
+							type="button"
+							onClick={handleSubmitCustomerInfo}
+						>
+							Próximo Passo
+							<ArrowRight className="size-4" />
+						</Button>
 					</div>
 				</div>
 
-				<CheckoutOrderSummary
-					actionHref="/checkout/payment"
-					actionLabel="Ir para Pagamento"
-				/>
+				<CheckoutOrderSummary />
 			</div>
 		</div>
 	);

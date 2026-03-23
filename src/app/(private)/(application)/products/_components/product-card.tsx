@@ -15,6 +15,16 @@ interface ProductCardProps {
 export function ProductCard({ product }: ProductCardProps) {
 	const { addItem } = useCartSheet();
 
+	function handleAddToCartClick() {
+		addItem({
+			highlight: product.category,
+			id: product.id,
+			image: product.image,
+			name: product.name,
+			unitPrice: product.price,
+		});
+	}
+
 	return (
 		<article className="group relative overflow-hidden rounded-xl border border-rose-100/80 bg-white shadow-[0_14px_28px_-24px_rgba(15,23,42,0.45)] transition hover:-translate-y-0.5 hover:shadow-[0_20px_32px_-24px_rgba(190,24,93,0.32)]">
 			<button
@@ -64,15 +74,7 @@ export function ProductCard({ product }: ProductCardProps) {
 					size="icon-xs"
 					aria-label={`Adicionar ${product.name} ao carrinho`}
 					className="relative z-20 h-7 w-7 rounded-full bg-rose-500 text-white shadow-none hover:bg-rose-600"
-					onClick={() =>
-						addItem({
-							highlight: product.category,
-							id: product.id,
-							image: product.image,
-							name: product.name,
-							unitPrice: product.price,
-						})
-					}
+					onClick={handleAddToCartClick}
 				>
 					<ShoppingBasket className="h-3.5 w-3.5" />
 				</Button>

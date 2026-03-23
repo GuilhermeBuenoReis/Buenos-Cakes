@@ -34,6 +34,10 @@ export function CartSheetContent() {
 	const { hasItems, itemCount, items, shipping, subtotal, total } =
 		useCartSheet();
 
+	function handleCheckoutButtonClick() {
+		router.push("/checkout");
+	}
+
 	return (
 		<SheetContent
 			side="right"
@@ -116,9 +120,7 @@ export function CartSheetContent() {
 					{hasItems ? (
 						<Button
 							className="h-11 rounded-full text-sm font-extrabold shadow-[0_14px_24px_rgba(244,63,94,0.18)]"
-							onClick={() => {
-								router.push("/checkout");
-							}}
+							onClick={handleCheckoutButtonClick}
 							type="button"
 						>
 							Finalizar Pedido

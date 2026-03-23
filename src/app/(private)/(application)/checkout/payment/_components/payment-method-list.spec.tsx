@@ -8,8 +8,8 @@ describe("PaymentMethodList", () => {
 	it("renders the payment methods inside a radiogroup", () => {
 		render(
 			<PaymentMethodList
+				handleSelectMethod={vi.fn()}
 				methods={paymentMethods}
-				onSelect={vi.fn()}
 				selectedMethod="pix"
 			/>,
 		);
@@ -23,18 +23,18 @@ describe("PaymentMethodList", () => {
 
 	it("notifies the selected payment method", async () => {
 		const user = userEvent.setup();
-		const onSelect = vi.fn();
+		const handleSelectMethod = vi.fn();
 
 		render(
 			<PaymentMethodList
+				handleSelectMethod={handleSelectMethod}
 				methods={paymentMethods}
-				onSelect={onSelect}
 				selectedMethod="pix"
 			/>,
 		);
 
 		await user.click(screen.getByRole("radio", { name: /Dinheiro/i }));
 
-		expect(onSelect).toHaveBeenCalledWith("cash");
+		expect(handleSelectMethod).toHaveBeenCalledWith("cash");
 	});
 });

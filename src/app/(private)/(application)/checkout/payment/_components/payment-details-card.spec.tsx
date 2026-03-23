@@ -8,7 +8,7 @@ describe("PaymentDetailsCard", () => {
 		render(
 			<PaymentDetailsCard
 				cashChange=""
-				onCashChange={vi.fn()}
+				handleCashChange={vi.fn()}
 				selectedPaymentMethod={paymentMethods[1]}
 			/>,
 		);
@@ -23,12 +23,12 @@ describe("PaymentDetailsCard", () => {
 	});
 
 	it("shows the cash change input and updates it", async () => {
-		const onCashChange = vi.fn();
+		const handleCashChange = vi.fn();
 
 		render(
 			<PaymentDetailsCard
 				cashChange=""
-				onCashChange={onCashChange}
+				handleCashChange={handleCashChange}
 				selectedPaymentMethod={paymentMethods[3]}
 			/>,
 		);
@@ -38,6 +38,6 @@ describe("PaymentDetailsCard", () => {
 		});
 
 		expect(screen.getByPlaceholderText("Ex.: 100,00")).toBeVisible();
-		expect(onCashChange).toHaveBeenLastCalledWith("120,00");
+		expect(handleCashChange).toHaveBeenLastCalledWith("120,00");
 	});
 });

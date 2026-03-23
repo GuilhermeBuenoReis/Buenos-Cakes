@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import { parseAsInteger, useQueryState } from "nuqs";
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 import { CarouselIndicators } from "@/app/(private)/(application)/dashboard/_components/carousel-indicators";
 
 const SLIDE_INTERVAL_MS = 5000;
@@ -44,22 +44,22 @@ export function SweetsCarousel() {
 	);
 	const safeActiveIndex = clampActiveIndex(activeIndex);
 
-	const handleAdvanceSlide = useCallback(() => {
-		setActiveIndex((currentIndex) =>
-			getNextSlideIndex(clampActiveIndex(currentIndex)),
-		);
-	}, [setActiveIndex]);
-
 	useEffect(() => {
+		function handleIntervalTick() {
+			setActiveIndex((currentIndex) =>
+				getNextSlideIndex(clampActiveIndex(currentIndex)),
+			);
+		}
+
 		const intervalId = window.setInterval(
-			handleAdvanceSlide,
+			handleIntervalTick,
 			SLIDE_INTERVAL_MS,
 		);
 
 		return () => {
 			window.clearInterval(intervalId);
 		};
-	}, [handleAdvanceSlide]);
+	}, [setActiveIndex]);
 
 	return (
 		<div className="relative mx-auto h-64 w-full max-w-lg overflow-hidden rounded-[26px] bg-linear-to-br from-slate-50 via-slate-100 to-slate-200 p-3 shadow-[0_24px_52px_-30px_rgba(15,23,42,0.55)] sm:h-78">

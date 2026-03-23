@@ -31,17 +31,23 @@ export function CarouselIndicators({
 
 	return (
 		<div className="pointer-events-none absolute bottom-5 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2 rounded-full bg-black/30 px-3 py-1.5 backdrop-blur-sm">
-			{carouselImages.map((image, index) => (
-				<button
-					aria-label={`Ir para imagem ${index + 1}`}
-					className={`pointer-events-auto h-2 rounded-full transition-all ${
-						index === safeActiveIndex ? "w-5 bg-white" : "w-2 bg-white/60"
-					}`}
-					key={image.src}
-					onClick={() => handleSetActiveIndex(index)}
-					type="button"
-				/>
-			))}
+			{carouselImages.map((image, index) => {
+				function handleIndicatorClick() {
+					handleSetActiveIndex(index);
+				}
+
+				return (
+					<button
+						aria-label={`Ir para imagem ${index + 1}`}
+						className={`pointer-events-auto h-2 rounded-full transition-all ${
+							index === safeActiveIndex ? "w-5 bg-white" : "w-2 bg-white/60"
+						}`}
+						key={image.src}
+						onClick={handleIndicatorClick}
+						type="button"
+					/>
+				);
+			})}
 		</div>
 	);
 }

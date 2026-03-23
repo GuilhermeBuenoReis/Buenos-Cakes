@@ -1,19 +1,24 @@
 "use client";
 
+import type { ChangeEvent } from "react";
 import { Input } from "@/components/ui/input";
 import type { PaymentMethod } from "./payment-methods";
 
 interface PaymentDetailsCardProps {
 	cashChange: string;
-	onCashChange: (value: string) => void;
+	handleCashChange: (value: string) => void;
 	selectedPaymentMethod: PaymentMethod;
 }
 
 export function PaymentDetailsCard({
 	cashChange,
-	onCashChange,
+	handleCashChange,
 	selectedPaymentMethod,
 }: PaymentDetailsCardProps) {
+	function handleCashChangeInput(event: ChangeEvent<HTMLInputElement>) {
+		handleCashChange(event.target.value);
+	}
+
 	if (selectedPaymentMethod.id === "cash") {
 		return (
 			<div className="rounded-[1.5rem] border border-[#ece4e4] bg-[#fffdfb] p-4 shadow-[0_16px_32px_-28px_rgba(15,23,42,0.14)]">
@@ -29,7 +34,7 @@ export function PaymentDetailsCard({
 					inputMode="decimal"
 					placeholder="Ex.: 100,00"
 					value={cashChange}
-					onChange={(event) => onCashChange(event.target.value)}
+					onChange={handleCashChangeInput}
 				/>
 				<p className="mt-3 text-xs leading-5 text-slate-500">
 					Esse campo é útil para incluir o troco direto no resumo final.

@@ -1,4 +1,5 @@
 import { Minus, Plus, ShoppingBasket, Star, Truck } from "lucide-react";
+import type { ChangeEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -50,6 +51,26 @@ export function ProductPurchasePanel() {
 		});
 	}
 
+	function handleSizeSelection(sizeId: (typeof sizeOptions)[number]["id"]) {
+		setSize(sizeId);
+	}
+
+	function handleFillingValueChange(nextFilling: string) {
+		setFilling(nextFilling);
+	}
+
+	function handleMessageChange(event: ChangeEvent<HTMLTextAreaElement>) {
+		setMessage(event.target.value);
+	}
+
+	function handleDecreaseQuantityClick() {
+		setQuantity(quantity - 1);
+	}
+
+	function handleIncreaseQuantityClick() {
+		setQuantity(quantity + 1);
+	}
+
 	return (
 		<div className="space-y-3.5 rounded-[24px] border border-white/70 bg-white/76 p-3.5 shadow-[0_22px_48px_-34px_rgba(190,24,93,0.28)] backdrop-blur-sm sm:space-y-4 sm:p-4.5">
 			<div className="space-y-2.5">
@@ -87,12 +108,16 @@ export function ProductPurchasePanel() {
 					{sizeOptions.map((size) => {
 						const isActive = size.id === selectedSize;
 
+						function handleSizeButtonClick() {
+							handleSizeSelection(size.id);
+						}
+
 						return (
 							<button
 								type="button"
 								key={size.id}
 								aria-pressed={isActive}
-								onClick={() => setSize(size.id)}
+								onClick={handleSizeButtonClick}
 								className={`rounded-[18px] border px-3 py-2 text-left transition ${
 									isActive
 										? "border-rose-400 bg-rose-50 shadow-[0_14px_30px_-24px_rgba(244,63,94,0.8)]"
@@ -115,7 +140,10 @@ export function ProductPurchasePanel() {
 				<p className="text-[11px] font-extrabold tracking-[0.12em] text-rose-400 uppercase">
 					Recheio extra
 				</p>
-				<Select value={selectedFilling} onValueChange={setFilling}>
+				<Select
+					value={selectedFilling}
+					onValueChange={handleFillingValueChange}
+				>
 					<SelectTrigger
 						aria-label="Selecionar recheio extra"
 						className="h-10 w-full rounded-[18px] border-slate-200 bg-slate-50 px-3.5 text-left text-[13px] text-slate-700"
@@ -144,7 +172,7 @@ export function ProductPurchasePanel() {
 				<textarea
 					aria-label="Mensagem personalizada"
 					value={message}
-					onChange={(event) => setMessage(event.target.value)}
+					onChange={handleMessageChange}
 					placeholder="Ex: Feliz aniversario, Maria!"
 					className="min-h-20 w-full rounded-[18px] border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-[13px] leading-5 text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-rose-300 focus:ring-4 focus:ring-rose-100"
 				/>
@@ -159,7 +187,7 @@ export function ProductPurchasePanel() {
 							size="icon-sm"
 							aria-label="Diminuir quantidade"
 							className="h-6.5 w-6.5 rounded-full text-rose-500 hover:bg-rose-50 hover:text-rose-500"
-							onClick={() => setQuantity(quantity - 1)}
+							onClick={handleDecreaseQuantityClick}
 						>
 							<Minus className="h-3 w-3" />
 						</Button>
@@ -175,7 +203,7 @@ export function ProductPurchasePanel() {
 							size="icon-sm"
 							aria-label="Aumentar quantidade"
 							className="h-6.5 w-6.5 rounded-full text-rose-500 hover:bg-rose-50 hover:text-rose-500"
-							onClick={() => setQuantity(quantity + 1)}
+							onClick={handleIncreaseQuantityClick}
 						>
 							<Plus className="h-3 w-3" />
 						</Button>

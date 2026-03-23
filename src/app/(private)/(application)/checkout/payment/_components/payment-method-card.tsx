@@ -4,17 +4,21 @@ import { cn } from "@/lib/utils";
 import type { PaymentMethod, PaymentMethodId } from "./payment-methods";
 
 interface PaymentMethodCardProps {
+	handleSelectMethod: (methodId: PaymentMethodId) => void;
 	isSelected: boolean;
 	method: PaymentMethod;
-	onSelect: (methodId: PaymentMethodId) => void;
 }
 
 export function PaymentMethodCard({
+	handleSelectMethod,
 	isSelected,
 	method,
-	onSelect,
 }: PaymentMethodCardProps) {
 	const Icon = method.icon;
+
+	function handleMethodSelectionChange() {
+		handleSelectMethod(method.id);
+	}
 
 	return (
 		<label
@@ -31,7 +35,7 @@ export function PaymentMethodCard({
 				name="payment-method"
 				type="radio"
 				value={method.id}
-				onChange={() => onSelect(method.id)}
+				onChange={handleMethodSelectionChange}
 			/>
 
 			<div className="flex items-start justify-between gap-3">

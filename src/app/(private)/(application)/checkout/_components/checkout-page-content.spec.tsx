@@ -6,9 +6,17 @@ import { CheckoutCustomerProvider } from "../_context/checkout-customer-context"
 import { CheckoutPickupProvider } from "../_context/checkout-pickup-context";
 
 const useCartSheetMock = vi.fn();
+const pushMock = vi.fn();
 
 vi.mock("@/contexts/cart-sheet-context", () => ({
 	useCartSheet: () => useCartSheetMock(),
+}));
+
+vi.mock("next/navigation", () => ({
+	usePathname: () => "/checkout",
+	useRouter: () => ({
+		push: pushMock,
+	}),
 }));
 
 import { CheckoutPageContent } from "./checkout-page-content";
@@ -63,6 +71,7 @@ describe("CheckoutPageContent", () => {
 	beforeEach(() => {
 		useCartSheetMock.mockReset();
 		useCartSheetMock.mockReturnValue(baseCartSheetValue);
+		pushMock.mockReset();
 	});
 
 	it("renders the checkout form and the order summary from cart items", () => {
@@ -85,18 +94,17 @@ describe("CheckoutPageContent", () => {
 		expect(
 			screen.getByRole("link", { name: "Voltar ao Carrinho" }),
 		).toHaveAttribute("href", "/products?cart=true");
-		expect(screen.getByRole("link", { name: "Próximo Passo" })).toHaveAttribute(
-			"href",
-			"/checkout/payment",
-		);
+		expect(screen.getByRole("button", { name: "Próximo Passo" })).toBeEnabled();
 		expect(
-			screen.getByRole("link", { name: "Ir para Pagamento" }),
-		).toHaveAttribute("href", "/checkout/payment");
+			screen.getByRole("button", { name: "Ir para Pagamento" }),
+		).toBeEnabled();
 	});
 
 	it("updates the pickup summary when selecting another date in the calendar and a time", async () => {
 		const user = userEvent.setup();
-		const calendarOnlyDate = dayjs(getInitialPickupDate()).add(7, "day").toDate();
+		const calendarOnlyDate = dayjs(getInitialPickupDate())
+			.add(7, "day")
+			.toDate();
 
 		renderCheckoutPageContent();
 
@@ -146,5 +154,34 @@ describe("CheckoutPageContent", () => {
 		expect(
 			screen.getByRole("button", { name: "Ir para Pagamento" }),
 		).toBeDisabled();
+	});
+
+	it("blocks navigation and shows zod validation errors when submitting without personal info", async () => {
+		const user = userEvent.setup();
+
+		renderCheckoutPageContent();
+
+		await user.click(screen.getByRole("button", { name: "Próximo Passo" }));
+
+		expect(await screen.findByText("Informe seu nome completo.")).toBeVisible();
+		expect(screen.getByText("Informe um e-mail válido.")).toBeVisible();
+		expect(screen.getByText("Informe seu telefone.")).toBeVisible();
+		expect(pushMock).not.toHaveBeenCalled();
+	});
+
+	it("navigates to payment after submitting valid personal info", async () => {
+		const user = userEvent.setup();
+
+		renderCheckoutPageContent();
+
+		await user.type(screen.getByLabelText("Nome Completo"), "Ana Silva");
+		await user.type(screen.getByLabelText("E-mail"), "ana@exemplo.com");
+		await user.type(
+			screen.getByLabelText("WhatsApp / Telefone"),
+			"(11) 99999-9999",
+		);
+		await user.click(screen.getByRole("button", { name: "Ir para Pagamento" }));
+
+		expect(pushMock).toHaveBeenCalledWith("/checkout/payment");
 	});
 });
