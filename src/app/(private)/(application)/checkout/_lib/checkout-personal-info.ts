@@ -28,3 +28,9 @@ export const defaultCheckoutPersonalInfoValues: CheckoutPersonalInfoValues = {
 	fullName: "",
 	phone: "",
 };
+
+export function isCheckoutPersonalInfoValid(
+	values: CheckoutPersonalInfoValues,
+) {
+	return checkoutPersonalInfoSchema.safeParse(values).success;
+}

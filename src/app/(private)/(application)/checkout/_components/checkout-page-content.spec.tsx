@@ -94,10 +94,12 @@ describe("CheckoutPageContent", () => {
 		expect(
 			screen.getByRole("link", { name: "Voltar ao Carrinho" }),
 		).toHaveAttribute("href", "/products?cart=true");
-		expect(screen.getByRole("button", { name: "Próximo Passo" })).toBeEnabled();
+		expect(
+			screen.getByRole("button", { name: "Próximo Passo" }),
+		).toBeDisabled();
 		expect(
 			screen.getByRole("button", { name: "Ir para Pagamento" }),
-		).toBeEnabled();
+		).toBeDisabled();
 	});
 
 	it("updates the pickup summary when selecting another date in the calendar and a time", async () => {
@@ -156,30 +158,36 @@ describe("CheckoutPageContent", () => {
 		).toBeDisabled();
 	});
 
-	it("blocks navigation and shows zod validation errors when submitting without personal info", async () => {
+	it("enables progression only after valid personal info", async () => {
 		const user = userEvent.setup();
 
 		renderCheckoutPageContent();
 
-		await user.click(screen.getByRole("button", { name: "Próximo Passo" }));
-
-		expect(await screen.findByText("Informe seu nome completo.")).toBeVisible();
-		expect(screen.getByText("Informe um e-mail válido.")).toBeVisible();
-		expect(screen.getByText("Informe seu telefone.")).toBeVisible();
-		expect(pushMock).not.toHaveBeenCalled();
-	});
-
-	it("navigates to payment after submitting valid personal info", async () => {
-		const user = userEvent.setup();
-
-		renderCheckoutPageContent();
+		expect(
+			screen.getByRole("button", { name: "Próximo Passo" }),
+		).toBeDisabled();
+		expect(
+			screen.getByRole("button", { name: "Ir para Pagamento" }),
+		).toBeDisabled();
 
 		await user.type(screen.getByLabelText("Nome Completo"), "Ana Silva");
+		expect(
+			screen.getByRole("button", { name: "Próximo Passo" }),
+		).toBeDisabled();
 		await user.type(screen.getByLabelText("E-mail"), "ana@exemplo.com");
+		expect(
+			screen.getByRole("button", { name: "Próximo Passo" }),
+		).toBeDisabled();
 		await user.type(
 			screen.getByLabelText("WhatsApp / Telefone"),
 			"(11) 99999-9999",
 		);
+
+		expect(screen.getByRole("button", { name: "Próximo Passo" })).toBeEnabled();
+		expect(
+			screen.getByRole("button", { name: "Ir para Pagamento" }),
+		).toBeEnabled();
+
 		await user.click(screen.getByRole("button", { name: "Ir para Pagamento" }));
 
 		expect(pushMock).toHaveBeenCalledWith("/checkout/payment");

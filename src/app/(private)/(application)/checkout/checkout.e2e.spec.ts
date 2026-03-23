@@ -32,7 +32,7 @@ test.describe("Checkout", () => {
 		await expect(page.getByText("1 item")).toBeVisible();
 		await expect(
 			page.getByRole("button", { name: "Ir para Pagamento" }),
-		).toBeVisible();
+		).toBeDisabled();
 	});
 
 	test("shows the empty state and disabled actions when opening checkout without cart items", async ({
@@ -116,7 +116,7 @@ test.describe("Checkout", () => {
 		await expect(page.getByText("Escolha como deseja pagar")).toBeVisible();
 	});
 
-	test("stays on checkout and shows validation errors when personal info is missing", async ({
+	test("keeps progression disabled while personal info is invalid", async ({
 		page,
 	}) => {
 		await page.goto("/products");
@@ -128,12 +128,13 @@ test.describe("Checkout", () => {
 			.click();
 
 		await page.getByRole("button", { name: "Finalizar Pedido" }).click();
-		await page.getByRole("button", { name: "Próximo Passo" }).click();
 
-		await expect(page).toHaveURL(/\/checkout$/);
-		await expect(page.getByText("Informe seu nome completo.")).toBeVisible();
-		await expect(page.getByText("Informe um e-mail válido.")).toBeVisible();
-		await expect(page.getByText("Informe seu telefone.")).toBeVisible();
+		await expect(
+			page.getByRole("button", { name: "Próximo Passo" }),
+		).toBeDisabled();
+		await expect(
+			page.getByRole("button", { name: "Ir para Pagamento" }),
+		).toBeDisabled();
 	});
 
 	test("reviews the collected order data before confirmation", async ({

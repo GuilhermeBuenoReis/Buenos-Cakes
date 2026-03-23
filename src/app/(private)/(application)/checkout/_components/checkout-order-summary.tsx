@@ -8,6 +8,7 @@ import { useCartSheet } from "@/contexts/cart-sheet-context";
 import { formatPrice } from "@/lib/format-price";
 import { useCheckoutCustomer } from "../_context/checkout-customer-context";
 import { useCheckoutPickup } from "../_context/checkout-pickup-context";
+import { isCheckoutPersonalInfoValid } from "../_lib/checkout-personal-info";
 import { formatPickupSummaryDate } from "../_lib/checkout-pickup";
 import { CheckoutCard } from "./checkout-card";
 
@@ -17,9 +18,11 @@ const checkoutOrderSummaryDisclaimer =
 export function CheckoutOrderSummary() {
 	const { hasItems, items, shipping, subtotal, total } = useCartSheet();
 	const pathname = usePathname();
-	const { handleSubmitCustomerInfo } = useCheckoutCustomer();
+	const { customerInfo, handleSubmitCustomerInfo } = useCheckoutCustomer();
 	const { pickupDate, pickupTime } = useCheckoutPickup();
 	const shouldShowAction = pathname === "/checkout";
+	const isCheckoutProgressBlocked =
+		!hasItems || !isCheckoutPersonalInfoValid(customerInfo);
 
 	return (
 		<aside className="xl:sticky xl:top-6 xl:self-start">
@@ -130,7 +133,7 @@ export function CheckoutOrderSummary() {
 				{shouldShowAction ? (
 					<Button
 						className="mt-6 h-11 w-full rounded-full bg-[#d45470] text-white shadow-[0_18px_36px_-24px_rgba(212,84,112,0.45)] hover:bg-[#c64a65]"
-						disabled={!hasItems}
+						disabled={isCheckoutProgressBlocked}
 						type="button"
 						onClick={handleSubmitCustomerInfo}
 					>

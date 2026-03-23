@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useCartSheet } from "@/contexts/cart-sheet-context";
 import { useCheckoutCustomer } from "../_context/checkout-customer-context";
+import { isCheckoutPersonalInfoValid } from "../_lib/checkout-personal-info";
 import { checkoutPickupLocation } from "../_lib/checkout-pickup-location";
 import { CheckoutCard } from "./checkout-card";
 import { CheckoutHero } from "./checkout-hero";
@@ -15,7 +16,9 @@ import { CheckoutPickupScheduler } from "./checkout-pickup-scheduler";
 
 export function CheckoutPageContent() {
 	const { hasItems } = useCartSheet();
-	const { handleSubmitCustomerInfo } = useCheckoutCustomer();
+	const { customerInfo, handleSubmitCustomerInfo } = useCheckoutCustomer();
+	const isCheckoutProgressBlocked =
+		!hasItems || !isCheckoutPersonalInfoValid(customerInfo);
 
 	return (
 		<div className="relative space-y-7 pb-6">
@@ -58,7 +61,7 @@ export function CheckoutPageContent() {
 
 						<Button
 							className="h-11 rounded-full bg-[#d45470] px-6 text-white shadow-[0_18px_36px_-24px_rgba(212,84,112,0.45)] hover:bg-[#c74a65]"
-							disabled={!hasItems}
+							disabled={isCheckoutProgressBlocked}
 							type="button"
 							onClick={handleSubmitCustomerInfo}
 						>

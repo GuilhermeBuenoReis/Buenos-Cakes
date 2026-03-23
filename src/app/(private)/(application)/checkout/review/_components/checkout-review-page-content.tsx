@@ -4,7 +4,7 @@ import { useCartSheet } from "@/contexts/cart-sheet-context";
 import { useCheckoutCustomer } from "../../_context/checkout-customer-context";
 import { useCheckoutPayment } from "../../_context/checkout-payment-context";
 import { useCheckoutPickup } from "../../_context/checkout-pickup-context";
-import { checkoutPersonalInfoSchema } from "../../_lib/checkout-personal-info";
+import { isCheckoutPersonalInfoValid } from "../../_lib/checkout-personal-info";
 import { formatPickupSummaryDate } from "../../_lib/checkout-pickup";
 import { checkoutPickupLocation } from "../../_lib/checkout-pickup-location";
 import { paymentMethods } from "../../payment/_components/payment-methods";
@@ -28,8 +28,7 @@ export function CheckoutReviewPageContent() {
 		(total, item) => total + item.quantity,
 		0,
 	);
-	const hasCustomerInfo =
-		checkoutPersonalInfoSchema.safeParse(customerInfo).success;
+	const hasCustomerInfo = isCheckoutPersonalInfoValid(customerInfo);
 	const selectedPaymentMethod =
 		paymentMethods.find((method) => method.id === selectedMethod) ??
 		paymentMethods[0];

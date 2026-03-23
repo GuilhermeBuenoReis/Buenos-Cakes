@@ -84,7 +84,7 @@ describe("CheckoutOrderSummary", () => {
 		);
 		expect(
 			screen.getByRole("button", { name: "Ir para Pagamento" }),
-		).toBeEnabled();
+		).toBeDisabled();
 	});
 
 	it("renders the empty state and disables checkout when there are no items", () => {
