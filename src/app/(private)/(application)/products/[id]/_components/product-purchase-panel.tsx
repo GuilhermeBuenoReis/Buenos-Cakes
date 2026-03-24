@@ -1,3 +1,5 @@
+"use client";
+
 import { Minus, Plus, ShoppingBasket, Star, Truck } from "lucide-react";
 import type { ChangeEvent } from "react";
 import { Button } from "@/components/ui/button";

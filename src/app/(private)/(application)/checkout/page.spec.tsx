@@ -2,8 +2,14 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { dayjs, getCalendarDayKey } from "@/lib/dayjs";
-import { CheckoutCustomerProvider } from "../_context/checkout-customer-context";
-import { CheckoutPickupProvider } from "../_context/checkout-pickup-context";
+import {
+	formatPickupSummaryDate,
+	getInitialPickupDate,
+} from "./_components/checkout-pickup-scheduler";
+import { CheckoutCustomerProvider } from "./_context/checkout-customer-context";
+import { CheckoutPickupProvider } from "./_context/checkout-pickup-context";
+import { metadata } from "./layout";
+import CheckoutPage from "./page";
 
 const useCartSheetMock = vi.fn();
 const pushMock = vi.fn();
@@ -18,12 +24,6 @@ vi.mock("next/navigation", () => ({
 		push: pushMock,
 	}),
 }));
-
-import { CheckoutPageContent } from "./checkout-page-content";
-import {
-	formatPickupSummaryDate,
-	getInitialPickupDate,
-} from "./checkout-pickup-scheduler";
 
 const baseCartSheetValue = {
 	addItem: vi.fn(),
@@ -57,25 +57,31 @@ const baseCartSheetValue = {
 	total: 155,
 };
 
-function renderCheckoutPageContent() {
+function renderCheckoutPage() {
 	return render(
 		<CheckoutPickupProvider>
 			<CheckoutCustomerProvider>
-				<CheckoutPageContent />
+				<CheckoutPage />
 			</CheckoutCustomerProvider>
 		</CheckoutPickupProvider>,
 	);
 }
 
-describe("CheckoutPageContent", () => {
+describe("CheckoutPage", () => {
 	beforeEach(() => {
 		useCartSheetMock.mockReset();
 		useCartSheetMock.mockReturnValue(baseCartSheetValue);
 		pushMock.mockReset();
 	});
 
+	it("exports the checkout metadata from the route layout", () => {
+		expect(metadata).toEqual({
+			title: "Finalizar Pedido | Buenos'Cakes",
+		});
+	});
+
 	it("renders the checkout form and the order summary from cart items", () => {
-		renderCheckoutPageContent();
+		renderCheckoutPage();
 
 		expect(
 			screen.getByRole("heading", { name: "Finalizar Pedido" }),
@@ -108,7 +114,7 @@ describe("CheckoutPageContent", () => {
 			.add(7, "day")
 			.toDate();
 
-		renderCheckoutPageContent();
+		renderCheckoutPage();
 
 		fireEvent.change(screen.getByLabelText("Horário da retirada"), {
 			target: { value: "17:00" },
@@ -147,7 +153,7 @@ describe("CheckoutPageContent", () => {
 			total: 0,
 		});
 
-		renderCheckoutPageContent();
+		renderCheckoutPage();
 
 		expect(screen.getByText("Seu carrinho ainda está vazio.")).toBeVisible();
 		expect(
@@ -161,7 +167,7 @@ describe("CheckoutPageContent", () => {
 	it("enables progression only after valid personal info", async () => {
 		const user = userEvent.setup();
 
-		renderCheckoutPageContent();
+		renderCheckoutPage();
 
 		expect(
 			screen.getByRole("button", { name: "Próximo Passo" }),

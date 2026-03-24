@@ -1,3 +1,5 @@
+"use client";
+
 import { ShieldCheck, Truck } from "lucide-react";
 import { useProductDetails } from "../_context/product-details-context";
 
