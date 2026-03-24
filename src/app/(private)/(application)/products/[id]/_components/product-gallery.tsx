@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import { useProductDetails } from "../_context/product-details-context";
 

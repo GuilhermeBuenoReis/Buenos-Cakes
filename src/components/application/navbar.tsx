@@ -8,14 +8,10 @@ import { NavbarCart } from "./navbar-cart";
 const navItems = [
 	{ label: "Início", href: "/dashboard" },
 	{ label: "Produtos", href: "/products" },
-	{ label: "Sobre Nós", href: "#" },
+	{ label: "Sobre Nós", href: "/about" },
 ];
 
 function isNavItemActive(pathname: string, href: string) {
-	if (href === "#") {
-		return false;
-	}
-
 	if (href === "/dashboard") {
 		return pathname === "/" || pathname === href;
 	}
@@ -37,7 +33,7 @@ export function Navbar() {
 				</Link>
 
 				<nav className="hidden items-center gap-11 md:flex">
-					{navItems.map((item) => {
+					{navItems.map(function renderNavItem(item) {
 						const isActive = isNavItemActive(pathname, item.href);
 
 						return (

@@ -45,4 +45,19 @@ describe("Navbar", () => {
 			"aria-current",
 		);
 	});
+
+	it("highlights the about link on the about route", () => {
+		usePathnameMock.mockReturnValue("/about");
+
+		render(<Navbar />);
+
+		expect(screen.getByRole("link", { name: "Sobre Nós" })).toHaveAttribute(
+			"aria-current",
+			"page",
+		);
+		expect(screen.getByRole("link", { name: "Sobre Nós" })).toHaveAttribute(
+			"href",
+			"/about",
+		);
+	});
 });

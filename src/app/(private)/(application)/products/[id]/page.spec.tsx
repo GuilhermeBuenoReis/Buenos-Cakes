@@ -1,23 +1,26 @@
 import { render, screen } from "@testing-library/react";
+import { NuqsTestingAdapter } from "nuqs/adapters/testing";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Product } from "@/api/products/types";
+import { CartSheetProvider } from "@/contexts/cart-sheet-context";
 
 const mocks = vi.hoisted(() => ({
 	getProductById: vi.fn(),
 	getProductIds: vi.fn(),
-	productDetailsContent: vi.fn(),
+	getProducts: vi.fn(),
+	notFound: vi.fn(() => {
+		throw new Error("NEXT_NOT_FOUND");
+	}),
 }));
 
 vi.mock("@/api/products", () => ({
 	getProductById: mocks.getProductById,
 	getProductIds: mocks.getProductIds,
+	getProducts: mocks.getProducts,
 }));
 
-vi.mock("./_components/product-details-content", () => ({
-	ProductDetailsContent: (props: unknown) => {
-		mocks.productDetailsContent(props);
-		return <div data-testid="product-details-content" />;
-	},
+vi.mock("next/navigation", () => ({
+	notFound: mocks.notFound,
 }));
 
 import ProductDetailsPage, {
@@ -82,17 +85,84 @@ describe("ProductDetailsPage", () => {
 		});
 	});
 
-	it("renders the details component and passes only the product id", async () => {
+	it("renders the page with the fetched product, related images and purchase panel", async () => {
+		const relatedProducts: Product[] = [
+			{
+				...baseProduct,
+				id: "prd_rel_1",
+				name: "Cupcake Berry Bliss",
+			},
+			{
+				...baseProduct,
+				id: "prd_rel_2",
+				name: "Bolo de Cenoura Vovo",
+			},
+			{
+				...baseProduct,
+				id: "prd_rel_3",
+				name: "Bolo Chocolate Supremo",
+			},
+			{
+				...baseProduct,
+				id: "prd_rel_4",
+				name: "Bolo Brigadeiro Intenso",
+			},
+			{
+				...baseProduct,
+				id: "prd_rel_5",
+				name: "Bolo de Leite Ninho",
+			},
+			{
+				...baseProduct,
+				category: "Cookies",
+				id: "prd_cookie_1",
+				name: "Double Choc Cookie",
+			},
+		];
+
+		mocks.getProductById.mockResolvedValue(baseProduct);
+		mocks.getProducts.mockResolvedValue([baseProduct, ...relatedProducts]);
+
 		render(
-			await ProductDetailsPage({
-				params: Promise.resolve({ id: baseProduct.id }),
-			}),
+			<NuqsTestingAdapter hasMemory>
+				<CartSheetProvider>
+					{
+						await ProductDetailsPage({
+							params: Promise.resolve({ id: baseProduct.id }),
+						})
+					}
+				</CartSheetProvider>
+			</NuqsTestingAdapter>,
 		);
 
-		expect(screen.getByTestId("product-details-content")).toBeVisible();
-		expect(mocks.productDetailsContent).toHaveBeenCalledWith({
-			productId: baseProduct.id,
+		expect(
+			screen.getByRole("heading", { name: baseProduct.name }),
+		).toBeVisible();
+		expect(screen.getByText(`${baseProduct.name} - Pequeno`)).toBeVisible();
+		expect(screen.getByAltText(relatedProducts[0].name)).toBeVisible();
+		expect(screen.getByAltText(relatedProducts[3].name)).toBeVisible();
+		expect(
+			screen.queryByAltText(relatedProducts[4].name),
+		).not.toBeInTheDocument();
+		expect(
+			screen.getByRole("button", { name: "Adicionar ao Carrinho" }),
+		).toBeVisible();
+		expect(mocks.getProductById).toHaveBeenCalledWith({
+			id: baseProduct.id,
 		});
-		expect(mocks.getProductById).not.toHaveBeenCalled();
+		expect(mocks.getProducts).toHaveBeenCalledWith();
+	});
+
+	it("calls notFound when the requested product does not exist", async () => {
+		mocks.getProductById.mockResolvedValue(null);
+		mocks.getProducts.mockResolvedValue([]);
+
+		await expect(
+			ProductDetailsPage({
+				params: Promise.resolve({ id: "prd_nao_existe" }),
+			}),
+		).rejects.toThrow("NEXT_NOT_FOUND");
+
+		expect(mocks.notFound).toHaveBeenCalledTimes(1);
 	});
 });

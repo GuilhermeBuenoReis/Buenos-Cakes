@@ -1,3 +1,5 @@
+"use client";
+
 import { useProductsCatalog } from "../_context/products-catalog-context";
 import { ProductCard } from "./product-card";
 
