@@ -32,14 +32,6 @@ export function AboutCtaSection() {
 							<ArrowRight className="size-4" />
 						</Link>
 					</Button>
-
-					<Button
-						asChild
-						className="h-11 rounded-full border-[#eadbde] bg-white px-6 text-slate-700 hover:border-rose-200 hover:bg-white hover:text-rose-500"
-						variant="outline"
-					>
-						<Link href="/checkout">Começar um pedido</Link>
-					</Button>
 				</div>
 			</div>
 		</section>

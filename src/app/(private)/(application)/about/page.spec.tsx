@@ -29,7 +29,5 @@ function handlePageRenderAssertion() {
 		"href",
 		"/products",
 	);
-	expect(
-		screen.getByRole("link", { name: "Começar um pedido" }),
-	).toHaveAttribute("href", "/checkout");
+	expect(screen.getByText("Vamos celebrar juntos")).toBeVisible();
 }
