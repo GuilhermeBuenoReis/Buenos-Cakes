@@ -1,6 +1,8 @@
 "use client";
 
 import { useCartSheet } from "@/contexts/cart-sheet-context";
+import { navigateToPath } from "@/lib/client-navigation";
+import { useOrderHistoryStore } from "@/stores/order-history-store";
 import { useCheckoutCustomer } from "../_context/checkout-customer-context";
 import { useCheckoutPayment } from "../_context/checkout-payment-context";
 import { useCheckoutPickup } from "../_context/checkout-pickup-context";
@@ -19,19 +21,49 @@ import { CheckoutTotalCard } from "./_components/checkout-total-card";
 const reviewDiscount = 0;
 
 export default function CheckoutReviewPage() {
-	const { hasItems, items, shipping, subtotal } = useCartSheet();
+	const { clearItems, hasItems, items, shipping, subtotal } = useCartSheet();
 	const { customerInfo } = useCheckoutCustomer();
 	const { cashChange, selectedMethod } = useCheckoutPayment();
 	const { pickupDate, pickupTime } = useCheckoutPickup();
+	const createOrder = useOrderHistoryStore((state) => state.createOrder);
 	const reviewTotal = subtotal + shipping - reviewDiscount;
 	const reviewItemCount = items.reduce(
 		(total, item) => total + item.quantity,
 		0,
 	);
 	const hasCustomerInfo = isCheckoutPersonalInfoValid(customerInfo);
+	const pickupDateLabel = formatPickupSummaryDate(pickupDate);
 	const selectedPaymentMethod =
 		paymentMethods.find((method) => method.id === selectedMethod) ??
 		paymentMethods[0];
+
+	function handleConfirmOrder() {
+		if (!hasItems || !hasCustomerInfo) {
+			return;
+		}
+
+		const confirmedOrder = createOrder({
+			customer: customerInfo,
+			items,
+			payment: {
+				cashChange,
+				methodId: selectedPaymentMethod.id,
+				methodLabel: selectedPaymentMethod.label,
+			},
+			pickup: {
+				address: checkoutPickupLocation.address,
+				dateLabel: pickupDateLabel,
+				locationName: checkoutPickupLocation.name,
+				timeLabel: pickupTime,
+				typeLabel: "Retirada no local",
+			},
+			subtotal,
+			total: reviewTotal,
+		});
+
+		clearItems();
+		navigateToPath(`/profile#${confirmedOrder.id}`);
+	}
 
 	return (
 		<div className="relative space-y-7 pb-6">
@@ -45,7 +77,7 @@ export default function CheckoutReviewPage() {
 					<div className="grid gap-6 xl:grid-cols-2">
 						<CheckoutDeliveryInfo
 							address={checkoutPickupLocation.address}
-							dateLabel={formatPickupSummaryDate(pickupDate)}
+							dateLabel={pickupDateLabel}
 							locationName={checkoutPickupLocation.name}
 							note="Retirada confirmada no balcão principal da loja."
 							timeLabel={pickupTime}
@@ -60,6 +92,7 @@ export default function CheckoutReviewPage() {
 					<CheckoutCustomerInfo customer={customerInfo} />
 					<CheckoutConfirmActions
 						confirmDisabled={!hasItems || !hasCustomerInfo}
+						onConfirm={handleConfirmOrder}
 					/>
 				</div>
 
@@ -74,7 +107,7 @@ export default function CheckoutReviewPage() {
 					<CheckoutDeliveryInfo
 						address={checkoutPickupLocation.address}
 						compact
-						dateLabel={formatPickupSummaryDate(pickupDate)}
+						dateLabel={pickupDateLabel}
 						locationName={checkoutPickupLocation.name}
 						timeLabel={pickupTime}
 						typeLabel="Retirada no local"

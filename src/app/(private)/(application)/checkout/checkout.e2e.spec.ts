@@ -6,6 +6,8 @@ import {
 } from "./_components/checkout-pickup-scheduler";
 
 test.describe("Checkout", () => {
+	test.describe.configure({ mode: "serial" });
+
 	test("navigates from the cart to checkout and preserves the order summary", async ({
 		page,
 	}) => {
@@ -137,7 +139,7 @@ test.describe("Checkout", () => {
 		).toBeDisabled();
 	});
 
-	test("reviews the collected order data before confirmation", async ({
+	test("confirms the order and makes it available in the profile page", async ({
 		page,
 	}) => {
 		await page.goto("/products");
@@ -178,5 +180,24 @@ test.describe("Checkout", () => {
 		await expect(
 			page.getByRole("button", { name: "Confirmar Pedido" }),
 		).toBeEnabled();
+
+		await page.getByRole("button", { name: "Confirmar Pedido" }).click();
+
+		await expect(page).toHaveURL(/\/profile#order-\d+$/);
+		await expect(
+			page.getByRole("heading", { name: "Pedidos Recentes" }),
+		).toBeVisible();
+		await expect(page.getByText("Ana Beatriz Souza")).toBeVisible();
+		await expect(page.getByText("#9482")).toBeVisible();
+		await expect(page.getByText("Bolo Red Velvet Premium")).toBeVisible();
+		await expect(
+			page.getByRole("button", { name: "Carrinho" }).getByText("0"),
+		).toBeVisible();
+
+		await page.reload();
+
+		await expect(page).toHaveURL(/\/profile#order-\d+$/);
+		await expect(page.getByText("#9482")).toBeVisible();
+		await expect(page.getByText("Bolo Red Velvet Premium")).toBeVisible();
 	});
 });
