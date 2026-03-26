@@ -1,9 +1,22 @@
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 import dayjs from "dayjs";
 import {
 	formatPickupSummaryDate,
 	getInitialPickupDate,
 } from "./_components/checkout-pickup-scheduler";
+
+async function goToCheckoutFromCart(page: Page) {
+	const cartDialog = page.getByRole("dialog", { name: "Meu Carrinho" });
+	const checkoutButton = cartDialog.getByRole("button", {
+		exact: true,
+		name: "Finalizar Pedido",
+	});
+
+	await expect(checkoutButton).toBeVisible();
+	await expect(checkoutButton).toBeEnabled();
+
+	await Promise.all([page.waitForURL(/\/checkout$/), checkoutButton.click()]);
+}
 
 test.describe("Checkout", () => {
 	test.describe.configure({ mode: "serial" });
@@ -23,9 +36,8 @@ test.describe("Checkout", () => {
 			page.getByRole("heading", { name: "Meu Carrinho" }),
 		).toBeVisible();
 
-		await page.getByRole("button", { name: "Finalizar Pedido" }).click();
+		await goToCheckoutFromCart(page);
 
-		await expect(page).toHaveURL(/\/checkout$/);
 		await expect(
 			page.getByRole("heading", { name: "Finalizar Pedido" }),
 		).toBeVisible();
@@ -105,7 +117,7 @@ test.describe("Checkout", () => {
 			})
 			.click();
 
-		await page.getByRole("button", { name: "Finalizar Pedido" }).click();
+		await goToCheckoutFromCart(page);
 		await page.getByLabel("Nome Completo").fill("Ana Beatriz Souza");
 		await page.getByLabel("E-mail").fill("ana.souza@exemplo.com");
 		await page.getByLabel("WhatsApp / Telefone").fill("(11) 99876-5432");
@@ -129,7 +141,7 @@ test.describe("Checkout", () => {
 			})
 			.click();
 
-		await page.getByRole("button", { name: "Finalizar Pedido" }).click();
+		await goToCheckoutFromCart(page);
 
 		await expect(
 			page.getByRole("button", { name: "Próximo Passo" }),
@@ -150,7 +162,7 @@ test.describe("Checkout", () => {
 			})
 			.click();
 
-		await page.getByRole("button", { name: "Finalizar Pedido" }).click();
+		await goToCheckoutFromCart(page);
 
 		await page.getByLabel("Nome Completo").fill("Ana Beatriz Souza");
 		await page.getByLabel("E-mail").fill("ana.souza@exemplo.com");

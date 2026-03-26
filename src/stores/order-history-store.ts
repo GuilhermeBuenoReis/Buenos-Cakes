@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import type { CheckoutPersonalInfoValues } from "@/app/(private)/(application)/checkout/_lib/checkout-personal-info";
+import type { CheckoutPersonalInfoValues } from "@/app/(private)/(account)/checkout/_lib/checkout-personal-info";
 import type { CartSheetItemData } from "@/contexts/cart-sheet-context";
 
 export const orderHistoryStorageKey = "buenos-cakes.order-history";
