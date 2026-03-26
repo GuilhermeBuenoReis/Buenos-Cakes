@@ -1,5 +1,5 @@
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 import { CheckoutConfirmActions } from "./checkout-confirm-actions";
 
 describe("CheckoutConfirmActions", () => {
@@ -20,5 +20,15 @@ describe("CheckoutConfirmActions", () => {
 		expect(
 			screen.getByRole("button", { name: "Confirmar Pedido" }),
 		).toBeDisabled();
+	});
+
+	it("calls the confirm handler when clicking the action", () => {
+		const handleConfirm = vi.fn();
+
+		render(<CheckoutConfirmActions onConfirm={handleConfirm} />);
+
+		fireEvent.click(screen.getByRole("button", { name: "Confirmar Pedido" }));
+
+		expect(handleConfirm).toHaveBeenCalledTimes(1);
 	});
 });

@@ -30,6 +30,7 @@ interface CartSheetContextValue {
 	subtotal: number;
 	total: number;
 	addItem: (item: AddCartSheetItemInput) => void;
+	clearItems: () => void;
 	decreaseQuantity: (itemId: string) => void;
 	increaseQuantity: (itemId: string) => void;
 	removeItem: (itemId: string) => void;
@@ -110,6 +111,11 @@ export function CartSheetProvider({
 		);
 	}
 
+	function clearItems() {
+		setItems([]);
+		setIsOpen(false);
+	}
+
 	const itemCount = items.reduce((total, item) => total + item.quantity, 0);
 	const subtotal = items.reduce(
 		(total, item) => total + item.unitPrice * item.quantity,
@@ -121,6 +127,7 @@ export function CartSheetProvider({
 		<CartSheetContext.Provider
 			value={{
 				addItem,
+				clearItems,
 				decreaseQuantity,
 				hasItems: items.length > 0,
 				increaseQuantity,

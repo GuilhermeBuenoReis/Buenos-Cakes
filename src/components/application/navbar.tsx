@@ -3,6 +3,7 @@
 import { User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 import { NavbarCart } from "./navbar-cart";
 
 const navItems = [
@@ -21,6 +22,7 @@ function isNavItemActive(pathname: string, href: string) {
 
 export function Navbar() {
 	const pathname = usePathname();
+	const isProfileActive = isNavItemActive(pathname, "/profile");
 
 	return (
 		<header className="rounded-2xl bg-white px-6 py-5 shadow-sm sm:px-8">
@@ -56,13 +58,17 @@ export function Navbar() {
 				<div className="flex items-center gap-5 text-[#4b5563]">
 					<NavbarCart />
 
-					<button
-						type="button"
+					<Link
 						aria-label="Perfil"
-						className="transition hover:text-[#ff4b61] cursor-pointer"
+						aria-current={isProfileActive ? "page" : undefined}
+						className={cn(
+							"flex size-10 items-center justify-center rounded-full border border-[#f2e7ea] bg-[#fff6f7] text-[#4b5563] transition hover:border-rose-200 hover:text-[#ff4b61]",
+							isProfileActive && "border-rose-200 text-[#ff4b61]",
+						)}
+						href="/profile"
 					>
 						<User className="h-5 w-5" />
-					</button>
+					</Link>
 				</div>
 			</div>
 		</header>

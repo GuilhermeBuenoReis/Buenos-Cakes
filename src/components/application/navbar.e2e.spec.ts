@@ -19,7 +19,7 @@ test.describe("Navbar", () => {
 		await expect(page).toHaveURL(/\/products$/);
 
 		await aboutLink.click();
-		await expect(page).toHaveURL(/\/products#?$/);
+		await expect(page).toHaveURL(/\/about$/);
 
 		await homeLink.click();
 		await expect(page).toHaveURL(/\/dashboard$/);
@@ -28,14 +28,18 @@ test.describe("Navbar", () => {
 		await expect(page).toHaveURL(/\/dashboard$/);
 	});
 
-	test("simulates clicks on navbar action buttons", async ({ page }) => {
+	test("simulates clicks on navbar action controls", async ({ page }) => {
 		await page.goto("/dashboard");
 
+		const navbar = page.getByRole("banner");
 		const cartButton = page.getByRole("button", { name: "Carrinho" });
-		const profileButton = page.getByRole("button", { name: "Perfil" });
+		const profileLink = navbar.getByRole("link", {
+			exact: true,
+			name: "Perfil",
+		});
 
 		await expect(cartButton).toBeVisible();
-		await expect(profileButton).toBeVisible();
+		await expect(profileLink).toBeVisible();
 		await expect(cartButton.getByText("0")).toBeVisible();
 
 		const currentPathname = new URL(page.url()).pathname;
@@ -77,8 +81,8 @@ test.describe("Navbar", () => {
 				pathname: currentPathname,
 			});
 
-		await profileButton.click();
-		await expect(profileButton).toBeFocused();
-		await expect.poll(() => new URL(page.url()).pathname).toBe(currentPathname);
+		await profileLink.click();
+		await expect(page).toHaveURL(/\/profile$/);
+		await expect(profileLink).toHaveAttribute("aria-current", "page");
 	});
 });

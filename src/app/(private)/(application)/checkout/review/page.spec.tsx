@@ -1,7 +1,12 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { NuqsTestingAdapter } from "nuqs/adapters/testing";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { CartSheetProvider } from "@/contexts/cart-sheet-context";
+import {
+	resetOrderHistoryStore,
+	useOrderHistoryStore,
+} from "@/stores/order-history-store";
 import { createCartItemFromCatalog } from "@/test/catalog-seed";
 import { CheckoutCustomerProvider } from "../_context/checkout-customer-context";
 import { CheckoutPaymentProvider } from "../_context/checkout-payment-context";
@@ -9,6 +14,28 @@ import { CheckoutPickupProvider } from "../_context/checkout-pickup-context";
 import { defaultCheckoutPersonalInfoValues } from "../_lib/checkout-personal-info";
 import { metadata } from "./layout";
 import CheckoutReviewPage from "./page";
+
+const assignLocationMock = vi.fn();
+
+vi.mock("@/lib/client-navigation", () => ({
+	navigateToPath: (path: string) => assignLocationMock(path),
+}));
+
+function OrderHistorySnapshot() {
+	const orders = useOrderHistoryStore((state) => state.orders);
+
+	return (
+		<div data-testid="order-history-snapshot">
+			{JSON.stringify(
+				orders.map((order) => ({
+					id: order.id,
+					number: order.number,
+					total: order.total,
+				})),
+			)}
+		</div>
+	);
+}
 
 function renderCheckoutReviewPage({
 	customerInfo = {
@@ -35,6 +62,7 @@ function renderCheckoutReviewPage({
 					<CheckoutCustomerProvider initialCustomerInfo={customerInfo}>
 						<CheckoutPaymentProvider initialSelectedMethod="debit-card">
 							<CheckoutReviewPage />
+							<OrderHistorySnapshot />
 						</CheckoutPaymentProvider>
 					</CheckoutCustomerProvider>
 				</CheckoutPickupProvider>
@@ -44,6 +72,31 @@ function renderCheckoutReviewPage({
 }
 
 describe("CheckoutReviewPage", () => {
+	beforeEach(() => {
+		resetOrderHistoryStore();
+	});
+
+	it("creates an order, clears the cart and redirects to profile after confirmation", async () => {
+		const user = userEvent.setup();
+
+		assignLocationMock.mockReset();
+		renderCheckoutReviewPage();
+
+		await user.click(screen.getByRole("button", { name: "Confirmar Pedido" }));
+
+		expect(screen.getByText("Seu carrinho ainda está vazio.")).toBeVisible();
+		expect(screen.getByTestId("order-history-snapshot")).toHaveTextContent(
+			'"number":"#9482"',
+		);
+		expect(screen.getByTestId("order-history-snapshot")).toHaveTextContent(
+			'"total":253.9',
+		);
+		expect(assignLocationMock).toHaveBeenCalledWith("/profile#order-9482");
+		expect(
+			screen.getByRole("button", { name: "Confirmar Pedido" }),
+		).toBeDisabled();
+	});
+
 	it("exports the review metadata from the nested layout", () => {
 		expect(metadata).toEqual({
 			title: "Revisão do Pedido | Buenos'Cakes",

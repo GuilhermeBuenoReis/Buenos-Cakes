@@ -60,4 +60,19 @@ describe("Navbar", () => {
 			"/about",
 		);
 	});
+
+	it("renders the profile icon as a link and highlights it on the profile route", () => {
+		usePathnameMock.mockReturnValue("/profile");
+
+		render(<Navbar />);
+
+		expect(screen.getByRole("link", { name: "Perfil" })).toHaveAttribute(
+			"href",
+			"/profile",
+		);
+		expect(screen.getByRole("link", { name: "Perfil" })).toHaveAttribute(
+			"aria-current",
+			"page",
+		);
+	});
 });

@@ -10,7 +10,7 @@ export function HeroActions() {
 				className="cursor-pointer rounded-full shadow-lg shadow-rose-500/20"
 				size="lg"
 			>
-				<Link href="/application/products">
+				<Link href="/products">
 					Comprar Agora
 					<ArrowRight className="h-4 w-4" />
 				</Link>
@@ -22,7 +22,7 @@ export function HeroActions() {
 				size="lg"
 				variant="outline"
 			>
-				<Link href="/application/products">Ver Catálogo</Link>
+				<Link href="/products">Ver Catálogo</Link>
 			</Button>
 		</div>
 	);
