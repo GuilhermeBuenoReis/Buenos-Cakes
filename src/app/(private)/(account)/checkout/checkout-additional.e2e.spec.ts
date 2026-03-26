@@ -1,10 +1,26 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 
-async function goToCheckoutPayment(page: Page, customer: {
-	email: string;
-	fullName: string;
-	phone: string;
-}) {
+async function goToCheckoutFromCart(page: Page) {
+	const cartDialog = page.getByRole("dialog", { name: "Meu Carrinho" });
+	const checkoutButton = cartDialog.getByRole("button", {
+		exact: true,
+		name: "Finalizar Pedido",
+	});
+
+	await expect(checkoutButton).toBeVisible();
+	await expect(checkoutButton).toBeEnabled();
+
+	await Promise.all([page.waitForURL(/\/checkout$/), checkoutButton.click()]);
+}
+
+async function goToCheckoutPayment(
+	page: Page,
+	customer: {
+		email: string;
+		fullName: string;
+		phone: string;
+	},
+) {
 	await page.goto("/products");
 
 	await page
@@ -13,7 +29,7 @@ async function goToCheckoutPayment(page: Page, customer: {
 		})
 		.click();
 
-	await page.getByRole("button", { name: "Finalizar Pedido" }).click();
+	await goToCheckoutFromCart(page);
 	await page.getByLabel("Nome Completo").fill(customer.fullName);
 	await page.getByLabel("E-mail").fill(customer.email);
 	await page.getByLabel("WhatsApp / Telefone").fill(customer.phone);
@@ -22,11 +38,14 @@ async function goToCheckoutPayment(page: Page, customer: {
 	await expect(page).toHaveURL(/\/checkout\/payment$/);
 }
 
-async function goToCheckoutReview(page: Page, customer: {
-	email: string;
-	fullName: string;
-	phone: string;
-}) {
+async function goToCheckoutReview(
+	page: Page,
+	customer: {
+		email: string;
+		fullName: string;
+		phone: string;
+	},
+) {
 	await goToCheckoutPayment(page, customer);
 	await page.getByRole("link", { name: "Continuar para revisão" }).click();
 
